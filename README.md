@@ -26,11 +26,35 @@ CODE
 
 msmn = MasamuneAst::AbstractSyntaxTree.new(code)
 
+# Searching the tree returns the specific node and the line number it's on.
 msmn.variables
 #=> [[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"]]
 
 msmn.search(:variable, "java")
 #=> [[[1, 0], "java"], [[2, 13], "java"]]
+
+code = <<CODE
+ary = [1, 2, 3]
+ary.sum.times do |n|
+  puts n
+end
+
+def foo
+end
+foo
+foo # Call again
+CODE
+
+msmn = MasamuneAst::AbstractSyntaxTree.new(code)
+
+msmn.search(:method_call, "sum")
+#=> [[[2, 4], "sum"]]
+
+msmn.search(:def, "foo")
+#=> [[[6, 4], "foo"]]
+
+msmn.search(:method_call, "foo")
+#=> [[[8, 0], "foo"], [[9, 0], "foo"]]
 ```
 
 In some cases, it can be easier to look at the given lex nodes to analyze your source code:
