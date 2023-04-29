@@ -100,8 +100,6 @@ module Masamune
     end
 
     def data_node_parts(tree_node)
-      # _, data_node = tree_node
-      # _, token, position = data_node
       _, token, position = tree_node
       [position, token]
     end
