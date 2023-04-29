@@ -5,7 +5,6 @@ module Masamune
 
     def initialize(code)
       @data = Ripper.sexp(code)
-      @_parent_node = nil
       @debug = false
     end
 
