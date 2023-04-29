@@ -1,4 +1,4 @@
-module Masamune
+module MasamuneAst
   module Slicer
     def initialize(ast)
       @ast = ast

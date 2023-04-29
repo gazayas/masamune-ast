@@ -1,11 +1,11 @@
-# Masamune
+# MasamuneAst
 
 ## A Ruby source code analyzer based on Ripper’s Abstract Syntax Tree generator (`Ripper#sexp`).
 
 ## Installation
 
 ```ruby
-gem "masamune"
+gem "masamune-ast"
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ puts java + " is not " + javascript
 # java
 CODE
 
-msmn = Masamune::AbstractSyntaxTree.new(code)
+msmn = MasamuneAst::AbstractSyntaxTree.new(code)
 
 msmn.variables
 [[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"]]

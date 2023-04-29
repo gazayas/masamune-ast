@@ -1,6 +1,6 @@
 # TODO: Not sure if I'll implement this yet.
 
-module Masamune
+module MasamuneAst
   class AbstractSyntaxTree
     class Node
       def initialize(tree_node)

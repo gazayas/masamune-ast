@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    masamune (0.1.0)
+    masamune-ast (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -18,7 +18,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  masamune!
+  masamune-ast!
   minitest (~> 5.0)
   pry
   rake (~> 13.0)

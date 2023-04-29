@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class TestMasamune < Minitest::Test
+class TestMasamuneAst < Minitest::Test
   # TODO: Match results with LexNode instances.
 
   def test_find_variable
@@ -13,7 +13,7 @@ class TestMasamune < Minitest::Test
       # java (Doesn't pick up comments)
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
+    msmn = MasamuneAst::AbstractSyntaxTree.new(similar_identifiers)
     assert msmn.search(:variable).size == 4
     assert msmn.search(:variable, "java").size == 3
     assert msmn.search(:variable, "javascript").size == 1
@@ -29,7 +29,7 @@ class TestMasamune < Minitest::Test
       foo # Call foo again.
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(methods_and_strings)
+    msmn = MasamuneAst::AbstractSyntaxTree.new(methods_and_strings)
 
     # Methods
     assert msmn.all_methods.size == 3
@@ -49,7 +49,7 @@ class TestMasamune < Minitest::Test
       end
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(blocks)
+    msmn = MasamuneAst::AbstractSyntaxTree.new(blocks)
     methods = msmn.all_methods
     assert methods.size == 2
 
@@ -66,7 +66,8 @@ class TestMasamune < Minitest::Test
       # java (Doesn't pick up comments)
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
+    msmn = MasamuneAst::AbstractSyntaxTree.new(similar_identifiers)
+    binding.pry
     assert msmn.lex_nodes.first.is_variable?
     refute msmn.lex_nodes.first.is_method?
     refute msmn.lex_nodes.first.is_string?
