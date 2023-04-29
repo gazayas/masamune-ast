@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["g-zayas@hotmail.com"]
 
   spec.summary = "Masamune"
-  spec.description = "Masamune gem"
+  spec.description = "A layer of abstraction on top of Ripper for handling Abstract Syntax Trees in Ruby."
   spec.homepage = "https://www.github.com/gazayas/masamune"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
