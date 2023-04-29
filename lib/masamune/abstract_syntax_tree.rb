@@ -72,7 +72,8 @@ module Masamune
             # The second element is where more :call nodes are nested, so we search it.
           end
 
-        # Method calls and chained methods like `[1, 2, 3].sum.times`.
+        # The data nodes in :call nodes are structured differently, so we handle that here.
+        # These :call nodes represent methods and chained methods like `[1, 2, 3].sum.times`.
         elsif (type == :method_call && tree_node.first == :call)
           # The method inside the [:call, ...] data node is the last element in the array.
           position, data_node_token = data_node_parts(tree_node.last)
