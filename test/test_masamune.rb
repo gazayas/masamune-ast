@@ -32,7 +32,7 @@ class TestMasamune < Minitest::Test
     msmn = Masamune::AbstractSyntaxTree.new(methods_and_strings)
 
     # Methods
-    assert msmn.methods.size == 3
+    assert msmn.all_methods.size == 3
     assert msmn.method_calls.size == 2
     assert msmn.method_definitions.size == 1
 
@@ -50,7 +50,7 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(blocks)
-    methods = msmn.methods
+    methods = msmn.all_methods
     assert methods.size == 2
 
     method_names = methods.map {|m| m.last}

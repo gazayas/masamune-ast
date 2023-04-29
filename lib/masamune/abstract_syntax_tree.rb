@@ -21,7 +21,7 @@ module Masamune
       search(:variable)
     end
 
-    def methods
+    def all_methods
       method_definitions + method_calls
     end
 
