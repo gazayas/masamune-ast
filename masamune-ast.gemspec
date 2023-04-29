@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require_relative "lib/masamune/version"
+require_relative "lib/masamune-ast/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "masamune"
-  spec.version = Masamune::VERSION
+  spec.name = "masamune-ast"
+  spec.version = MasamuneAst::VERSION
   spec.authors = ["Gabriel Zayas"]
   spec.email = ["g-zayas@hotmail.com"]
 
-  spec.summary = "Masamune"
+  spec.summary = "MasamuneAst"
   spec.description = "A layer of abstraction on top of Ripper for handling Abstract Syntax Trees in Ruby."
   spec.homepage = "https://www.github.com/gazayas/masamune"
   spec.license = "MIT"
