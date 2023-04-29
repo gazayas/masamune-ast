@@ -1,34 +1,65 @@
 # Masamune
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/masamune`. To experiment with that code, run `bin/console` for an interactive prompt.
+## A Ruby source code analyzer based on Ripper’s Abstract Syntax Tree generator (`Ripper#sexp`).
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem "masamune"
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+Pinpoint variables and methods in your source code even when other tokens have the same or similar spelling:
+```ruby
+code = <<CODE
+java = "java"
+javascript = java + "script"
+puts java + " is not " + javascript
+# java
+CODE
 
-## Development
+msmn = Masamune::AbstractSyntaxTree.new(code)
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+msmn.variables
+[[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"]]
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+msmn.search(:variable, "java")
+#=> [[[1, 0], "java"], [[2, 13], "java"]]
+```
+
+In some cases, it can be easier to look at the given lex nodes to analyze your source code:
+```ruby
+msmn.lex_nodes
+=> [#<Masamune::LexNode:0x00007fd61810cac0 @ast_id=1200, @index=0, @position=[1, 0], @state=CMDARG, @token="java", @type=:ident>,
+ #<Masamune::LexNode:0x00007fd61810c930 @ast_id=1200, @index=1, @position=[1, 4], @state=CMDARG, @token=" ", @type=:sp>,
+ #<Masamune::LexNode:0x00007fd61810c7c8 @ast_id=1200, @index=2, @position=[1, 5], @state=BEG, @token="=", @type=:op>,
+ #<Masamune::LexNode:0x00007fd61810c638 @ast_id=1200, @index=3, @position=[1, 6], @state=BEG, @token=" ", @type=:sp>,
+ #<Masamune::LexNode:0x00007fd61810c480 @ast_id=1200, @index=4, @position=[1, 7], @state=BEG, @token="\"", @type=:tstring_beg>,
+ #<Masamune::LexNode:0x00007fd61810c318 @ast_id=1200, @index=5, @position=[1, 8], @state=BEG, @token="java", @type=:tstring_content>,
+ #<Masamune::LexNode:0x00007fd61810c188 @ast_id=1200, @index=6, @position=[1, 12], @state=END, @token="\"", @type=:tstring_end>,
+ #<Masamune::LexNode:0x00007fd61810c020 @ast_id=1200, @index=7, @position=[1, 13], @state=BEG, @token="\n", @type=:nl>,
+ #<Masamune::LexNode:0x00007fd618113e88 @ast_id=1200, @index=8, @position=[2, 0], @state=CMDARG, @token="javascript", @type=:ident>,
+ #<Masamune::LexNode:0x00007fd618113cf8 @ast_id=1200, @index=9, @position=[2, 10], @state=CMDARG, @token=" ", @type=:sp>,
+ #<Masamune::LexNode:0x00007fd618113b68 @ast_id=1200, @index=10, @position=[2, 11], @state=BEG, @token="=", @type=:op>,
+…
+]
+
+msmn.lex_nodes[8].is_variable?
+#=> true
+
+msmn.lex_nodes[8].is_string?
+#=> false
+
+msmn.lex_nodes[8].is_method_definition?
+#=> false
+
+# etc...
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/masamune.
+Bug reports and pull requests are welcome on GitHub at https://github.com/gazayas/masamune.
 
 ## License
 
