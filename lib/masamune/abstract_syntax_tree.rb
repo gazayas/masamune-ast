@@ -1,10 +1,14 @@
 module Masamune
   class AbstractSyntaxTree
     attr_reader :data
-    attr_accessor :parent_node, :debug
+    attr_accessor :lex_nodes, :debug
 
     def initialize(code)
       @data = Ripper.sexp(code)
+      raw_lex_nodes = Ripper.lex(code)
+      @lex_nodes = raw_lex_nodes.map do |lex_node|
+        Masamune::LexNode.new(raw_lex_nodes.index(lex_node), lex_node, @data.__id__)
+      end
       @debug = false
     end
 

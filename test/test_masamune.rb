@@ -13,10 +13,10 @@ class TestMasamune < Minitest::Test
       # java (Doesn't pick up comments)
     CODE
 
-    msmn = Masamune::Base.new(similar_identifiers)
-    assert msmn.ast.search(:variable).size == 4
-    assert msmn.ast.search(:variable, "java").size == 3
-    assert msmn.ast.search(:variable, "javascript").size == 1
+    msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
+    assert msmn.search(:variable).size == 4
+    assert msmn.search(:variable, "java").size == 3
+    assert msmn.search(:variable, "javascript").size == 1
   end
 
   def test_find_method_and_string
@@ -29,16 +29,16 @@ class TestMasamune < Minitest::Test
       foo # Call foo again.
     CODE
 
-    msmn = Masamune::Base.new(methods_and_strings)
+    msmn = Masamune::AbstractSyntaxTree.new(methods_and_strings)
 
     # Methods
-    assert msmn.ast.methods.size == 3
-    assert msmn.ast.method_calls.size == 2
-    assert msmn.ast.method_definitions.size == 1
+    assert msmn.methods.size == 3
+    assert msmn.method_calls.size == 2
+    assert msmn.method_definitions.size == 1
 
     # Strings
-    assert msmn.ast.strings.size == 2
-    assert msmn.ast.search(:string, "foo").size == 1
+    assert msmn.strings.size == 2
+    assert msmn.search(:string, "foo").size == 1
   end
 
   def test_chained_method_calls
@@ -49,8 +49,8 @@ class TestMasamune < Minitest::Test
       end
     CODE
 
-    msmn = Masamune::Base.new(blocks)
-    methods = msmn.ast.methods
+    msmn = Masamune::AbstractSyntaxTree.new(blocks)
+    methods = msmn.methods
     assert methods.size == 2
 
     method_names = methods.map {|m| m.last}
