@@ -65,14 +65,10 @@ module Masamune
           # Continue search for all necessary elements.
           case tree_node.first
           when :def, :command
-            # TODO: We can delete the [1..] now that the return statement is at the beginning of this method.
-            tree_node[1..].each { |node| search(type, token, node, result) }
-          when :call
-            # Method calls and chained methods like `[1, 2, 3].sum.times`.
-            # The second element is where more :call nodes are nested, so we search it.
+            tree_node.each { |node| search(type, token, node, result) }
           end
 
-        # The data nodes in :call nodes are structured differently, so we handle that here.
+        # The data nodes in :call nodes are in a different place within the array, so we handle that here.
         # These :call nodes represent methods and chained methods like `[1, 2, 3].sum.times`.
         elsif (type == :method_call && tree_node.first == :call)
           # The method inside the [:call, ...] data node is the last element in the array.
@@ -81,9 +77,8 @@ module Masamune
           # The second element is where more :call nodes are nested, so we search it.
           search(type, token, tree_node[1], result)
         else
-          # TODO: We can delete the [1..] now that the return statement is at the beginning of this method.
-          # For all other nodes, search the entire node except for the first element which is a symbol.
-          tree_node[1..].each { |node| search(type, token, node, result) }
+          # Simply continue the search for all other nodes.
+          tree_node.each { |node| search(type, token, node, result) }
         end
       end
 
