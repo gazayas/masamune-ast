@@ -5,6 +5,11 @@
 ## Installation
 
 ```ruby
+sudo gem install "masamune-ast"
+```
+
+Or add the following to your Gemfile and run `bundle install`
+```ruby
 gem "masamune-ast"
 ```
 
@@ -22,7 +27,7 @@ CODE
 msmn = MasamuneAst::AbstractSyntaxTree.new(code)
 
 msmn.variables
-[[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"]]
+#=> [[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"]]
 
 msmn.search(:variable, "java")
 #=> [[[1, 0], "java"], [[2, 13], "java"]]
@@ -59,7 +64,7 @@ msmn.lex_nodes[8].is_method_definition?
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/gazayas/masamune.
+Bug reports and pull requests are welcome on GitHub at https://github.com/gazayas/masamune-ast.
 
 ## License
 
