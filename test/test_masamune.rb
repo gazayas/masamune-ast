@@ -57,4 +57,18 @@ class TestMasamune < Minitest::Test
     assert method_names.include?("sum")
     assert method_names.include?("times")
   end
+
+  def test_lex_nodes_return_proper_type
+    similar_identifiers = <<~CODE
+      java = "java"
+      javascript = java + "script"
+      p java
+      # java (Doesn't pick up comments)
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
+    assert msmn.lex_nodes.first.is_variable?
+    refute msmn.lex_nodes.first.is_method?
+    refute msmn.lex_nodes.first.is_string?
+  end
 end
