@@ -1,8 +1,8 @@
 # TODO: Not sure if I'll implement this yet.
 
-module MasamuneAst
+module Masamune
   class AbstractSyntaxTree
-    class DataNode << MasamuneAst::AbstractSyntaxTree::Node
+    class DataNode << Masamune::AbstractSyntaxTree::Node
       def initialize(tree_node)
         @parent, @contents, _ = tree_node
       end
