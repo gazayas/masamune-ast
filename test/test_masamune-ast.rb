@@ -67,7 +67,6 @@ class TestMasamune< Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
-    binding.pry
     assert msmn.lex_nodes.first.is_variable?
     refute msmn.lex_nodes.first.is_method?
     refute msmn.lex_nodes.first.is_string?
