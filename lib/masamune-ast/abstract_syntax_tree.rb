@@ -42,21 +42,26 @@ module Masamune
     end
 
     def search(type = nil, token = nil, tree_node = self.data, result = [])
-      return unless tree_node.is_a?(Array) || (tree_node.is_a?(Array) && tree_node.empty?)
+      return if !tree_node.is_a?(Array) || (tree_node.is_a?(Array) && tree_node.empty?)
       debug_output(tree_node) if @debug
 
       # If the first element is an array, then we're getting all arrays so we just continue the search.
       if tree_node.first.is_a?(Array)
         tree_node.each { |node| search(type, token, node, result) }
       elsif tree_node.first.is_a?(Symbol)
-        # TODO: These two if statements bother me a lot.
-        # There should be a more effiecient/smart way to do this.
         if has_data_node?(tree_node)
-          if (type == :variable && (tree_node.first == :var_field || tree_node.first == :var_ref)) ||
-             (type == :string && tree_node.first == :string_content) ||
-             (type == :def && tree_node.first == :def) ||
-             (type == :method_call && tree_node.first == :vcall)
+          register_result = case type
+          when :variable
+            tree_node.first == :var_field || tree_node.first == :var_ref
+          when :string
+            tree_node.first == :string_content
+          when :def
+            tree_node.first == :def
+          when :method_call
+            tree_node.first == :vcall
+          end
 
+          if register_result
             # TODO: AbstractSyntaxTree::DataNode.new(tree_node)
             # For most tree nodes, the data_node is housed in the second element.
             position, data_node_token = data_node_parts(tree_node[1])
