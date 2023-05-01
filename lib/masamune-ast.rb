@@ -8,5 +8,5 @@ require "masamune-ast/abstract_syntax_tree"
 require "pp"
 require "pry"
 
-module MasamuneAst
+module Masamune
 end

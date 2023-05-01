@@ -1,4 +1,4 @@
-module MasamuneAst
+module Masamune
   # https://docs.ruby-lang.org/en/3.0/Ripper.html#method-c-lex
   #
   # @position: Line number and starting point on the line. i.e. - [4, 7].

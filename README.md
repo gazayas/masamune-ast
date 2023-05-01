@@ -1,4 +1,4 @@
-# MasamuneAst
+# Masamune
 
 ## A Ruby source code analyzer based on Ripper’s Abstract Syntax Tree generator (`Ripper#sexp`).
 
@@ -24,7 +24,7 @@ puts java + " is not " + javascript
 # java
 CODE
 
-msmn = MasamuneAst::AbstractSyntaxTree.new(code)
+msmn = Masamune::AbstractSyntaxTree.new(code)
 
 # Searching the tree returns the specific node and the line number it's on.
 msmn.variables
@@ -45,7 +45,7 @@ foo
 foo # Call again
 CODE
 
-msmn = MasamuneAst::AbstractSyntaxTree.new(code)
+msmn = Masamune::AbstractSyntaxTree.new(code)
 
 msmn.search(:method_call, "sum")
 #=> [[[2, 4], "sum"]]
