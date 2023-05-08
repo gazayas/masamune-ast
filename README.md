@@ -28,10 +28,10 @@ msmn = Masamune::AbstractSyntaxTree.new(code)
 
 # Searching the tree returns the specific node and the line number it's on.
 msmn.variables
-#=> [[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"]]
+#=> [[[1, 0], "java"], [[2, 0], "javascript"], [[2, 13], "java"], [[3, 5], "java"], [[3, 25], "javascript"]]
 
 msmn.search(:variable, "java")
-#=> [[[1, 0], "java"], [[2, 13], "java"]]
+#=> [[[1, 0], "java"], [[2, 13], "java"], [[3, 5], "java"]]
 
 code = <<CODE
 ary = [1, 2, 3]
@@ -74,13 +74,13 @@ msmn.lex_nodes
 …
 ]
 
-msmn.lex_nodes[8].is_variable?
+msmn.lex_nodes.first.is_variable?
 #=> true
 
-msmn.lex_nodes[8].is_string?
+msmn.lex_nodes.first.is_string?
 #=> false
 
-msmn.lex_nodes[8].is_method_definition?
+msmn.lex_nodes.first.is_method_definition?
 #=> false
 
 # etc...
