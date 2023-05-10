@@ -44,18 +44,31 @@ class TestMasamune< Minitest::Test
   def test_chained_method_calls
     blocks = <<~CODE
       ary = [1, 2, 3]
+
+      # Picks up :do_block params.
       ary.sum.times do |n|
         puts n
       end
+
+      # Picks up :brace_block params.
+      ary.sum.times {|z| puts z}
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(blocks)
     methods = msmn.all_methods
-    assert methods.size == 2
+    assert methods.size == 4
 
     method_names = methods.map {|m| m.last}
     assert method_names.include?("sum")
     assert method_names.include?("times")
+
+    # Picks up ary, n, and z.
+    assert msmn.search(:variable).size == 7
+
+    # Check block params and their line positions.
+    assert msmn.block_params.size == 2
+    assert msmn.block_params.first.first == [4, 18]
+    assert msmn.block_params.last.first == [9, 16]
   end
 
   def test_lex_nodes_return_proper_type
