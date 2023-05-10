@@ -33,6 +33,11 @@ module Masamune
       search(:method_call)
     end
 
+    # TODO: Potentially split this into do_block_params and brace_block_params.
+    def block_params
+      search(:block_param)
+    end
+
     def strings
       search(:string)
     end
@@ -62,7 +67,6 @@ module Masamune
           end
 
           if register_result
-            # TODO: AbstractSyntaxTree::DataNode.new(tree_node)
             # For most tree nodes, the data_node is housed in the second element.
             position, data_node_token = data_node_parts(tree_node[1])
 
@@ -70,13 +74,14 @@ module Masamune
             result << [position, data_node_token] if token == data_node_token || token.nil?
           end
 
+          # TODO: Review this.
           # Continue search for all necessary elements.
           case tree_node.first
           when :def, :command
             tree_node.each { |node| search(type, token, node, result) }
           end
 
-        # The data nodes in :call nodes are in a different place within the array, so we handle that here.
+        # Handle :call nodes.
         # These :call nodes represent methods and chained methods like `[1, 2, 3].sum.times`.
         elsif (type == :method_call && tree_node.first == :call)
           # The method inside the [:call, ...] data node is the last element in the array.
@@ -84,8 +89,17 @@ module Masamune
           result << [position, data_node_token] if token == data_node_token || token.nil?
           # The second element is where more :call nodes are nested, so we search it.
           search(type, token, tree_node[1], result)
+
+        # Register block parameters.
+        elsif ((type == :variable || type == :block_param) && tree_node.first == :params)
+          block_params = tree_node[1]
+          block_params.each do |block_param|
+            position, data_node_token = data_node_parts(block_param)
+            result << [position, data_node_token]
+          end
+
+        # Simply continue the search for all other nodes.
         else
-          # Simply continue the search for all other nodes.
           tree_node.each { |node| search(type, token, node, result) }
         end
       end
