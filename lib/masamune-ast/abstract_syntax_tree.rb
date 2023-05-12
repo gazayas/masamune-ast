@@ -9,6 +9,7 @@ module Masamune
       @lex_nodes = raw_lex_nodes.map do |lex_node|
         Masamune::LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
       end
+
       @debug = false
     end
 
@@ -48,6 +49,10 @@ module Masamune
 
     def search(type = nil, token = nil, tree_node = self.data, result = [])
       return if !tree_node.is_a?(Array) || (tree_node.is_a?(Array) && tree_node.empty?)
+
+      msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+      # TODO: Masamune::AbstractSyntaxTree::NodeRegistry.register(node)
+
       debug_output(tree_node) if @debug
 
       # If the first element is an array, then we're getting all arrays so we just continue the search.
@@ -109,15 +114,6 @@ module Masamune
 
     private
 
-    # A data node represents an abstraction in the AST which has details about a specific command.
-    # i.e. - [:@ident, "variable_name", [4, 7]]
-    # These values are the `type`, `token`, and `position`, respectively.
-    # It is simliar to what you see in `Ripper.lex(code)` and `Masamune::Base's @lex_nodes`.
-    # Data nodes serve as a base case when recursively searching the AST.
-    #
-    # The parent node's first element houses the type of action being performed:
-    # i.e. - [:assign, [:@ident, "variable_name", [4, 7]]]
-    # `has_data_node?` is performed on a parent node.
     def has_data_node?(node)
       node[1].is_a?(Array) && node[1][1].is_a?(String)
     end

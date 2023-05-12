@@ -4,6 +4,7 @@ require_relative "masamune-ast/version"
 require "ripper"
 require "masamune-ast/lex_node"
 require "masamune-ast/abstract_syntax_tree"
+require "masamune-ast/abstract_syntax_tree/node"
 
 require "pp"
 require "pry"
