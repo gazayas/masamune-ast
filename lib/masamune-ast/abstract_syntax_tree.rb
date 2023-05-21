@@ -1,25 +1,54 @@
 module Masamune
   class AbstractSyntaxTree
     attr_reader :data
-    attr_accessor :lex_nodes, :debug
+    attr_accessor :node_list, :lex_nodes
 
     def initialize(code)
       @data = Ripper.sexp(code)
+      @node_list = []
+      @data_nodes = []
+
       raw_lex_nodes = Ripper.lex(code)
       @lex_nodes = raw_lex_nodes.map do |lex_node|
         Masamune::LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
       end
-
-      @debug = false
     end
 
-    def tree_nodes
-      raise "Set `debug` to `true` to display the tree nodes" unless @debug
-      search # Perform search with no conditions.
+    # TODO: Change to register_tree_nodes, add to initializer.
+    def parse(tree_node = self.data)
+      begin
+        # Here we create general nodes in the `else` statement if the node is a single value.
+        if tree_node.is_a?(Array)
+          class_name = "Masamune::AbstractSyntaxTree::#{tree_node.first.to_s.camelize}"
+          klass = class_name.constantize
+          msmn_node = klass.new(tree_node, self.__id__)
+        else
+          msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+        end
+
+      # For all other nodes that we haven't covered yet, we just make a general class.
+      # We can worry about adding the classes for other nodes later.
+      rescue NameError
+        msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+      end
+
+      # Register nodes.
+      @node_list << msmn_node
+      # TODO: Create the class inside msmn_node, then push the data nodes from there to the list.
+      # msmn_node.data_nodes.each { |dn| @data_nodes << dn } if msmn_node.data_nodes
+
+      # Continue parsing until base case is reached.
+      if !msmn_node.nil? && msmn_node.contents.is_a?(Array)
+        msmn_node.contents.each { |node| parse(node) }
+      end
     end
 
-    def variables
-      search(:variable)
+    def variables(var_name:)
+      var_nodes = @node_list.select do |node|
+        node.class == Masamune::AbstractSyntaxTree::VarField ||
+        node.class == Masamune::AbstractSyntaxTree::VarRef
+      end
+      get_data_nodes_from(var_nodes)
     end
 
     def all_methods
@@ -40,97 +69,21 @@ module Masamune
     end
 
     def strings
-      search(:string)
+      @node_list.select {|node| node.type == :string_content}
     end
 
     def data_nodes
-      search(:data_node)
+      @node_list.select {|node| node.is_a?(Masamune::AbstractSyntaxTree::DataNode)}
     end
 
-    def search(type = nil, token = nil, tree_node = self.data, result = [])
-      return if !tree_node.is_a?(Array) || (tree_node.is_a?(Array) && tree_node.empty?)
-
-      msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
-      # TODO: Masamune::AbstractSyntaxTree::NodeRegistry.register(node)
-
-      debug_output(tree_node) if @debug
-
-      # If the first element is an array, then we're getting all arrays so we just continue the search.
-      if tree_node.first.is_a?(Array)
-        tree_node.each { |node| search(type, token, node, result) }
-      elsif tree_node.first.is_a?(Symbol)
-        if has_data_node?(tree_node)
-          register_result = case type
-          when :variable
-            tree_node.first == :var_field || tree_node.first == :var_ref
-          when :string
-            tree_node.first == :string_content
-          when :def
-            tree_node.first == :def
-          when :method_call
-            tree_node.first == :vcall
-          end
-
-          if register_result
-            # For most tree nodes, the data_node is housed in the second element.
-            position, data_node_token = data_node_parts(tree_node[1])
-
-            # Gather all results if token isn't specified.
-            result << [position, data_node_token] if token == data_node_token || token.nil?
-          end
-
-          # TODO: Review this.
-          # Continue search for all necessary elements.
-          case tree_node.first
-          when :def, :command
-            tree_node.each { |node| search(type, token, node, result) }
-          end
-
-        # Handle :call nodes.
-        # These :call nodes represent methods and chained methods like `[1, 2, 3].sum.times`.
-        elsif (type == :method_call && tree_node.first == :call)
-          # The method inside the [:call, ...] data node is the last element in the array.
-          position, data_node_token = data_node_parts(tree_node.last)
-          result << [position, data_node_token] if token == data_node_token || token.nil?
-          # The second element is where more :call nodes are nested, so we search it.
-          search(type, token, tree_node[1], result)
-
-        # Register block parameters.
-        elsif ((type == :variable || type == :block_param) && tree_node.first == :params)
-          block_params = tree_node[1]
-          block_params.each do |block_param|
-            position, data_node_token = data_node_parts(block_param)
-            result << [position, data_node_token]
-          end
-
-        # Simply continue the search for all other nodes.
-        else
-          tree_node.each { |node| search(type, token, node, result) }
-        end
+    # Extract all data nodes from parsed msmn nodes, not Ripper.sexp's raw output.
+    def get_data_nodes_from(msmn_nodes)
+      msmn_nodes.map do |node|
+        node.data_nodes.map do |dn|
+          dn = Masamune::AbstractSyntaxTree::DataNode.new(dn, self.__id__)
+          [dn.line_position, dn.token]
+        end.flatten # TODO: I don't really like having `flatten` here.
       end
-
-      result
-    end
-
-    private
-
-    def has_data_node?(node)
-      node[1].is_a?(Array) && node[1][1].is_a?(String)
-    end
-
-    def data_node_parts(tree_node)
-      _, token, position = tree_node
-      [position, token]
-    end
-
-    def is_line_position?(tree_node)
-      tree_node.size == 2 && tree_node.first.is_a?(Integer) && tree_node.last.is_a?(Integer)
-    end
-
-    def debug_output(tree_node)
-      puts "==================================" # TODO: Track the array depth and output the number here.
-      puts "=================================="
-      p tree_node
     end
   end
 end

@@ -4,13 +4,15 @@
 # It is simliar to what you see in `Ripper.lex(code)` and `Masamune::AbstractSyntaxTree's @lex_nodes`.
 # Data nodes serve as a base case when recursively searching the AST.
 
-class Masamune::AbstractSyntaxTree::DataNode << Masamune::AbstractSyntaxTree::Node
-  def initialize(contents)
-    @type, @token, @line_position = contents
+module Masamune
+  class AbstractSyntaxTree
+    class DataNode < Node
+      attr_reader :type, :token, :line_position
 
-    # TODO
-    # @corresponding_lex_node
-
-    super
+      def initialize(contents, ast_id)
+        @type, @token, @line_position = contents
+        super(contents, ast_id)
+      end
+    end
   end
 end
