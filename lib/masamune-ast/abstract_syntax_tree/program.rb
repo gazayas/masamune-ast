@@ -9,7 +9,7 @@ module Masamune
       end
 
       def extract_data_nodes
-        # No data notes to extract.
+        # No data nodes to extract.
       end
     end
   end
