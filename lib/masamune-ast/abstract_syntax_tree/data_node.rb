@@ -13,6 +13,10 @@ module Masamune
         @type, @token, @line_position = contents
         super(contents, ast_id)
       end
+
+      def position_and_token
+        [@line_position, @token]
+      end
     end
   end
 end

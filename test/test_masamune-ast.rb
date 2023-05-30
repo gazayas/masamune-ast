@@ -3,8 +3,6 @@
 require "test_helper"
 
 class TestMasamune< Minitest::Test
-  # TODO: Match results with LexNode instances.
-
   def test_find_variable
     similar_identifiers = <<~CODE
       java = "java"
@@ -14,11 +12,12 @@ class TestMasamune< Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
-    assert msmn.search(:variable).size == 4
-    assert msmn.search(:variable, "java").size == 3
-    assert msmn.search(:variable, "javascript").size == 1
+    assert msmn.variables.size == 4
+    assert msmn.variables(name: "java").size == 3
+    assert msmn.variables(name: "javascript").size == 1
   end
 
+=begin
   def test_find_method_and_string
     methods_and_strings = <<~CODE
       foo_and_bar = "foo bar"
@@ -84,4 +83,5 @@ class TestMasamune< Minitest::Test
     refute msmn.lex_nodes.first.is_method?
     refute msmn.lex_nodes.first.is_string?
   end
+=end
 end

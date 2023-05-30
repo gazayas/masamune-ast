@@ -4,7 +4,6 @@ module Masamune
       attr_reader :ast_id, :contents, :index_stack, :data_nodes
 
       # TODO: Might be beneficial to change parent to the object's id.
-      # TODO: Change `data_nodes` to `top_level_data_nodes`.
       def initialize(contents, ast_id)
         @ast_id = ast_id
         @contents = contents
@@ -31,13 +30,11 @@ module Masamune
         !typed?
       end
 
-      # Most data nodes live at the second index of the array:
-      # i.e. - [:var_ref, [:@ident, "java", [3, 2]]]
-      # For all other nodes, we override this method
-      # to extract the data nodes according to its structure.
+      # By default, we assume a node has no data nodes to extract.
+      # Because the structure for each node is different, we handle
+      # extraction separately for each node within its respective class.
       def extract_data_nodes
-        # return if typeless? || !@contents.is_a?(Array) || @contents.first == :@ident
-        # [@contents[1]]
+        # TODO: Might want to make this [] instead of nil.
       end
     end
   end

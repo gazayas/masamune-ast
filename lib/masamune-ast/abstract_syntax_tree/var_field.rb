@@ -6,7 +6,9 @@ module Masamune
       end
 
       def extract_data_nodes
-        [@contents[1]]
+        [
+          Masamune::AbstractSyntaxTree::DataNode.new(@contents[1], @ast_id)
+        ]
       end
     end
   end
