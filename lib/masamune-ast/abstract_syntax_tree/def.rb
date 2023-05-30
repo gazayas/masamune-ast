@@ -1,3 +1,5 @@
+# TODO: Add description.
+
 module Masamune
   class AbstractSyntaxTree
     class Def < Node

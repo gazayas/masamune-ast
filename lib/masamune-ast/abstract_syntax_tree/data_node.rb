@@ -2,7 +2,6 @@
 # i.e. - [:@ident, "variable_name", [4, 7]]
 # These values are the `type`, `token`, and `position`, respectively.
 # It is simliar to what you see in `Ripper.lex(code)` and `Masamune::AbstractSyntaxTree's @lex_nodes`.
-# Data nodes serve as a base case when recursively searching the AST.
 
 module Masamune
   class AbstractSyntaxTree

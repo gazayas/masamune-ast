@@ -1,13 +1,13 @@
+# TODO: Add description
+
 module Masamune
   class AbstractSyntaxTree
     class Node
       attr_reader :ast_id, :contents, :index_stack, :data_nodes
 
-      # TODO: Might be beneficial to change parent to the object's id.
       def initialize(contents, ast_id)
         @ast_id = ast_id
         @contents = contents
-        @index_stack = index_stack
         @data_nodes = extract_data_nodes
       end
 

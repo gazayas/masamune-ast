@@ -12,7 +12,7 @@ module Masamune
 
       @node_list = []
       @data_node_list = []
-      register_nodes(@data) # Nodes are registered here to @node_list and @data_node_list.
+      register_nodes(@data)
     end
 
     def register_nodes(tree_node = self.data)

@@ -1,5 +1,4 @@
-# Program represents the top layer of the AST,
-# and the second element of the array houses the entire program.
+# TODO: Add description.
 
 module Masamune
   class AbstractSyntaxTree
