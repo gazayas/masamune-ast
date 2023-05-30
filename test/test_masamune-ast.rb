@@ -17,10 +17,23 @@ class TestMasamune< Minitest::Test
     assert msmn.variables(name: "javascript").size == 1
   end
 
+  def test_find_string
+    strings = <<~CODE
+      foo = "foo"
+      bar = "bar"
+      puts "foo bar"
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(strings)
+    assert msmn.strings.size == 3
+    assert msmn.strings(content: "foo").size == 1
+    assert msmn.strings(content: "bar").size == 1
+    assert msmn.strings(content: "foo bar").size == 1
+  end
+
 =begin
   def test_find_method_and_string
-    methods_and_strings = <<~CODE
-      foo_and_bar = "foo bar"
+    methods = <<~CODE
       def foo
         puts "foo"
       end
@@ -28,16 +41,12 @@ class TestMasamune< Minitest::Test
       foo # Call foo again.
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(methods_and_strings)
+    msmn = Masamune::AbstractSyntaxTree.new(methods)
 
     # Methods
     assert msmn.all_methods.size == 3
     assert msmn.method_calls.size == 2
     assert msmn.method_definitions.size == 1
-
-    # Strings
-    assert msmn.strings.size == 2
-    assert msmn.search(:string, "foo").size == 1
   end
 
   def test_chained_method_calls

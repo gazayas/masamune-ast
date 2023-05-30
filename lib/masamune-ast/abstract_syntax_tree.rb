@@ -79,9 +79,21 @@ module Masamune
       # :block_param
     end
 
-    def strings
-      # TODO: Make a class for :string_content
-      # @node_list.select {|node| node.type == :string_content}
+    def strings(content: nil)
+      var_nodes = @node_list.select do |node|
+        node.class == Masamune::AbstractSyntaxTree::StringContent
+      end
+
+      if content
+        var_nodes = var_nodes.select do |node|
+          node.data_nodes.first.token == content
+        end
+      end
+
+      # Return the token along with its line position.
+      var_nodes.map do |node|
+        node.data_nodes.map {|dn| dn.position_and_token}.flatten
+      end
     end
   end
 end
