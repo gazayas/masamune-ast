@@ -1,7 +1,7 @@
 module Masamune
   class AbstractSyntaxTree
     attr_reader :data
-    attr_accessor :lex_nodes, :debug
+    attr_accessor :node_list, :data_node_list, :lex_nodes
 
     def initialize(code)
       @data = Ripper.sexp(code)
@@ -9,132 +9,105 @@ module Masamune
       @lex_nodes = raw_lex_nodes.map do |lex_node|
         Masamune::LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
       end
-      @debug = false
+
+      @node_list = []
+      @data_node_list = []
+      register_nodes(@data)
     end
 
-    def tree_nodes
-      raise "Set `debug` to `true` to display the tree nodes" unless @debug
-      search # Perform search with no conditions.
+    def register_nodes(tree_node = self.data)
+      begin
+        if tree_node.is_a?(Array)
+          class_name = "Masamune::AbstractSyntaxTree::#{tree_node.first.to_s.camelize}"
+          klass = class_name.constantize
+          msmn_node = klass.new(tree_node, self.__id__)
+        else
+          msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+        end
+
+      # For all other nodes that we haven't covered yet, we just make a general class.
+      # We can worry about adding the classes for other nodes as we go.
+      rescue NameError
+        msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+      end
+
+      # Register nodes
+      @node_list << msmn_node
+      msmn_node.data_nodes.each { |dn| @data_node_list << dn } if msmn_node.data_nodes
+
+      # Continue down the tree until base case is reached.
+      if !msmn_node.nil? && msmn_node.contents.is_a?(Array)
+        msmn_node.contents.each { |node| register_nodes(node) }
+      end
     end
 
-    def variables
-      search(:variable)
+    # TODO: Consider adding block_params, maybe block_params: true, etc.
+    def variables(name: nil)
+      var_classes = [
+        Masamune::AbstractSyntaxTree::VarField,
+        Masamune::AbstractSyntaxTree::VarRef,
+        Masamune::AbstractSyntaxTree::Params
+      ]
+      find_nodes(var_classes, identifier: name)
+    end
+
+    def strings(content: nil)
+      find_nodes(Masamune::AbstractSyntaxTree::StringContent, identifier: content)
+    end
+
+    def method_definitions(name: nil)
+      find_nodes(Masamune::AbstractSyntaxTree::Def, identifier: name)
+    end
+
+    def method_calls(name: nil)
+      method_classes = [
+        Masamune::AbstractSyntaxTree::Vcall,
+        Masamune::AbstractSyntaxTree::Call
+      ]
+      find_nodes(method_classes, identifier: name)
+    end
+
+    # TODO
+    def do_block_params
+    end
+
+    # TODO
+    def brace_block_params
     end
 
     def all_methods
       method_definitions + method_calls
     end
 
-    def method_definitions
-      search(:def)
-    end
-
-    def method_calls
-      search(:method_call)
-    end
-
-    # TODO: Potentially split this into do_block_params and brace_block_params.
     def block_params
-      search(:block_param)
+      # TODO: do_block_params + brace_block_params
+      find_nodes(Masamune::AbstractSyntaxTree::Params)
     end
 
-    def strings
-      search(:string)
-    end
+    # TODO: Change `identifier` to `token`.
+    def find_nodes(identifier_classes, identifier: nil)
+      # Ensure the classes are in an array
+      identifier_classes = [identifier_classes].flatten
 
-    def data_nodes
-      search(:data_node)
-    end
-
-    def search(type = nil, token = nil, tree_node = self.data, result = [])
-      return if !tree_node.is_a?(Array) || (tree_node.is_a?(Array) && tree_node.empty?)
-      debug_output(tree_node) if @debug
-
-      # If the first element is an array, then we're getting all arrays so we just continue the search.
-      if tree_node.first.is_a?(Array)
-        tree_node.each { |node| search(type, token, node, result) }
-      elsif tree_node.first.is_a?(Symbol)
-        if has_data_node?(tree_node)
-          register_result = case type
-          when :variable
-            tree_node.first == :var_field || tree_node.first == :var_ref
-          when :string
-            tree_node.first == :string_content
-          when :def
-            tree_node.first == :def
-          when :method_call
-            tree_node.first == :vcall
-          end
-
-          if register_result
-            # For most tree nodes, the data_node is housed in the second element.
-            position, data_node_token = data_node_parts(tree_node[1])
-
-            # Gather all results if token isn't specified.
-            result << [position, data_node_token] if token == data_node_token || token.nil?
-          end
-
-          # TODO: Review this.
-          # Continue search for all necessary elements.
-          case tree_node.first
-          when :def, :command
-            tree_node.each { |node| search(type, token, node, result) }
-          end
-
-        # Handle :call nodes.
-        # These :call nodes represent methods and chained methods like `[1, 2, 3].sum.times`.
-        elsif (type == :method_call && tree_node.first == :call)
-          # The method inside the [:call, ...] data node is the last element in the array.
-          position, data_node_token = data_node_parts(tree_node.last)
-          result << [position, data_node_token] if token == data_node_token || token.nil?
-          # The second element is where more :call nodes are nested, so we search it.
-          search(type, token, tree_node[1], result)
-
-        # Register block parameters.
-        elsif ((type == :variable || type == :block_param) && tree_node.first == :params)
-          block_params = tree_node[1]
-          block_params.each do |block_param|
-            position, data_node_token = data_node_parts(block_param)
-            result << [position, data_node_token]
-          end
-
-        # Simply continue the search for all other nodes.
-        else
-          tree_node.each { |node| search(type, token, node, result) }
-        end
+      var_nodes = []
+      identifier_classes.each do |klass|
+        var_nodes << @node_list.select {|node| node.class == klass}
       end
 
-      result
-    end
+      # Searching for multiple classes will yield multi-dimensional arrays,
+      # so we ensure everything is flattened out before moving forward.
+      var_nodes.flatten!
 
-    private
+      if identifier
+        var_nodes = var_nodes.select {|node| node.data_nodes.first.token == identifier}.flatten
+      end
 
-    # A data node represents an abstraction in the AST which has details about a specific command.
-    # i.e. - [:@ident, "variable_name", [4, 7]]
-    # These values are the `type`, `token`, and `position`, respectively.
-    # It is simliar to what you see in `Ripper.lex(code)` and `Masamune::Base's @lex_nodes`.
-    # Data nodes serve as a base case when recursively searching the AST.
-    #
-    # The parent node's first element houses the type of action being performed:
-    # i.e. - [:assign, [:@ident, "variable_name", [4, 7]]]
-    # `has_data_node?` is performed on a parent node.
-    def has_data_node?(node)
-      node[1].is_a?(Array) && node[1][1].is_a?(String)
-    end
+      final_result = []
+      var_nodes.each do |node|
+        node.data_nodes.each {|dn| final_result << dn.position_and_token}
+      end
 
-    def data_node_parts(tree_node)
-      _, token, position = tree_node
-      [position, token]
-    end
-
-    def is_line_position?(tree_node)
-      tree_node.size == 2 && tree_node.first.is_a?(Integer) && tree_node.last.is_a?(Integer)
-    end
-
-    def debug_output(tree_node)
-      puts "==================================" # TODO: Track the array depth and output the number here.
-      puts "=================================="
-      p tree_node
+      Masamune::AbstractSyntaxTree::DataNode.order_results_by_position(final_result)
     end
   end
 end
