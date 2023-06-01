@@ -16,22 +16,16 @@ module Masamune
     end
 
     def register_nodes(tree_node = self.data)
-      begin
-        if tree_node.is_a?(Array)
-          class_name = "Masamune::AbstractSyntaxTree::#{tree_node.first.to_s.camelize}"
-          klass = class_name.constantize
-          msmn_node = klass.new(tree_node, self.__id__)
-        else
-          msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
-        end
-
-      # For all other nodes that we haven't covered yet, we just make a general class.
-      # We can worry about adding the classes for other nodes as we go.
-      rescue NameError
+      if tree_node.is_a?(Array)
+        klass = get_node_class(tree_node.first)
+        msmn_node = klass.new(tree_node, self.__id__)
+      else
+        # Create a general node if the node is a single value.
         msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
       end
 
-      # Register nodes
+      # Register nodes and any data nodes housed within it.
+      # See Masamune::AbstractSyntaxTree::DataNode for more details on what a data node is.
       @node_list << msmn_node
       msmn_node.data_nodes.each { |dn| @data_node_list << dn } if msmn_node.data_nodes
 
@@ -41,29 +35,29 @@ module Masamune
       end
     end
 
-    # TODO: Consider adding block_params, maybe block_params: true, etc.
+    # TODO: Add block_params: true to the arguments.
     def variables(name: nil)
       var_classes = [
-        Masamune::AbstractSyntaxTree::VarField,
-        Masamune::AbstractSyntaxTree::VarRef,
-        Masamune::AbstractSyntaxTree::Params
-      ]
+        :var_field,
+        :var_ref,
+        :params
+      ].map {|type| get_node_class(type)}
       find_nodes(var_classes, identifier: name)
     end
 
     def strings(content: nil)
-      find_nodes(Masamune::AbstractSyntaxTree::StringContent, identifier: content)
+      find_nodes(get_node_class(:string_content), identifier: content)
     end
 
     def method_definitions(name: nil)
-      find_nodes(Masamune::AbstractSyntaxTree::Def, identifier: name)
+      find_nodes(get_node_class(:def), identifier: name)
     end
 
     def method_calls(name: nil)
       method_classes = [
-        Masamune::AbstractSyntaxTree::Vcall,
-        Masamune::AbstractSyntaxTree::Call
-      ]
+        :vcall,
+        :call
+      ].map {|type| get_node_class(type)}
       find_nodes(method_classes, identifier: name)
     end
 
@@ -81,7 +75,7 @@ module Masamune
 
     def block_params
       # TODO: do_block_params + brace_block_params
-      find_nodes(Masamune::AbstractSyntaxTree::Params)
+      find_nodes(get_node_class(:params))
     end
 
     # TODO: Change `identifier` to `token`.
@@ -108,6 +102,19 @@ module Masamune
       end
 
       Masamune::AbstractSyntaxTree::DataNode.order_results_by_position(final_result)
+    end
+
+    private
+
+    def get_node_class(type)
+      begin
+        class_name = "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}"
+        klass = class_name.constantize
+      rescue NameError
+        # For all other nodes that we haven't covered yet, we just make a general class.
+        # We can worry about adding the classes for other nodes as we go.
+        msmn_node = Masamune::AbstractSyntaxTree::Node
+      end
     end
   end
 end
