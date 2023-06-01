@@ -41,59 +41,73 @@ module Masamune
       end
     end
 
+    # TODO: Consider adding block_params, maybe block_params: true, etc.
     def variables(name: nil)
-      var_nodes = @node_list.select do |node|
-        node.class == Masamune::AbstractSyntaxTree::VarField ||
-        node.class == Masamune::AbstractSyntaxTree::VarRef
-      end
+      var_classes = [
+        Masamune::AbstractSyntaxTree::VarField,
+        Masamune::AbstractSyntaxTree::VarRef,
+        Masamune::AbstractSyntaxTree::Params
+      ]
+      find_nodes(var_classes, identifier: name)
+    end
 
-      if name
-        var_nodes = var_nodes.select do |node|
-          node.data_nodes.first.token == name
-        end
-      end
+    def strings(content: nil)
+      find_nodes(Masamune::AbstractSyntaxTree::StringContent, identifier: content)
+    end
 
-      # Return the token along with its line position.
-      var_nodes.map do |node|
-        node.data_nodes.map {|dn| dn.position_and_token}.flatten
-      end
+    def method_definitions(name: nil)
+      find_nodes(Masamune::AbstractSyntaxTree::Def, identifier: name)
+    end
+
+    def method_calls(name: nil)
+      method_classes = [
+        Masamune::AbstractSyntaxTree::Vcall,
+        Masamune::AbstractSyntaxTree::Call
+      ]
+      find_nodes(method_classes, identifier: name)
+    end
+
+    # TODO
+    def do_block_params
+    end
+
+    # TODO
+    def brace_block_params
     end
 
     def all_methods
       method_definitions + method_calls
     end
 
-    def method_definitions
-      # TODO: Grab from @node_list
-      # :def
-    end
-
-    def method_calls
-      # TODO: Grab from @node_list
-      # :method_call
-    end
-
-    # TODO: Potentially split this into do_block_params and brace_block_params.
     def block_params
-      # TODO: Grab from @node_list
-      # :block_param
+      # TODO: do_block_params + brace_block_params
+      find_nodes(Masamune::AbstractSyntaxTree::Params)
     end
 
-    def strings(content: nil)
-      var_nodes = @node_list.select do |node|
-        node.class == Masamune::AbstractSyntaxTree::StringContent
+    # TODO: Change `identifier` to `token`.
+    def find_nodes(identifier_classes, identifier: nil)
+      # Ensure the classes are in an array
+      identifier_classes = [identifier_classes].flatten
+
+      var_nodes = []
+      identifier_classes.each do |klass|
+        var_nodes << @node_list.select {|node| node.class == klass}
       end
 
-      if content
-        var_nodes = var_nodes.select do |node|
-          node.data_nodes.first.token == content
-        end
+      # Searching for multiple classes will yield multi-dimensional arrays,
+      # so we ensure everything is flattened out before moving forward.
+      var_nodes.flatten!
+
+      if identifier
+        var_nodes = var_nodes.select {|node| node.data_nodes.first.token == identifier}.flatten
       end
 
-      # Return the token along with its line position.
-      var_nodes.map do |node|
-        node.data_nodes.map {|dn| dn.position_and_token}.flatten
+      final_result = []
+      var_nodes.each do |node|
+        node.data_nodes.each {|dn| final_result << dn.position_and_token}
       end
+
+      Masamune::AbstractSyntaxTree::DataNode.order_results_by_position(final_result)
     end
   end
 end
