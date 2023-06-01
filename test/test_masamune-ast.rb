@@ -31,7 +31,6 @@ class TestMasamune< Minitest::Test
     assert msmn.strings(content: "foo bar").size == 1
   end
 
-=begin
   def test_find_method_and_string
     methods = <<~CODE
       def foo
@@ -42,8 +41,6 @@ class TestMasamune< Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(methods)
-
-    # Methods
     assert msmn.all_methods.size == 3
     assert msmn.method_calls.size == 2
     assert msmn.method_definitions.size == 1
@@ -60,25 +57,28 @@ class TestMasamune< Minitest::Test
 
       # Picks up :brace_block params.
       ary.sum.times {|z| puts z}
+
+      {foo: "bar"}.each {|k, v| puts "Picks up multiple params"}
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(blocks)
     methods = msmn.all_methods
-    assert methods.size == 4
+    assert methods.size == 5
 
     method_names = methods.map {|m| m.last}
     assert method_names.include?("sum")
     assert method_names.include?("times")
 
-    # Picks up ary, n, and z.
-    assert msmn.search(:variable).size == 7
+    # Picks up ary, n, z, k, and v.
+    assert msmn.variables.size == 9
 
     # Check block params and their line positions.
-    assert msmn.block_params.size == 2
-    assert msmn.block_params.first.first == [4, 18]
-    assert msmn.block_params.last.first == [9, 16]
+    assert msmn.block_params.size == 4
+    assert msmn.block_params.first == [[4, 18], "n"]
+    assert msmn.block_params.last == [[11, 23], "v"]
   end
 
+=begin
   def test_lex_nodes_return_proper_type
     similar_identifiers = <<~CODE
       java = "java"
