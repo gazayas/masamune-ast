@@ -10,7 +10,12 @@ require "masamune-ast/abstract_syntax_tree/data_node"
 
 # Node Types
 require "masamune-ast/abstract_syntax_tree/assign"
+require "masamune-ast/abstract_syntax_tree/block_var"
+require "masamune-ast/abstract_syntax_tree/brace_block"
+require "masamune-ast/abstract_syntax_tree/call"
 require "masamune-ast/abstract_syntax_tree/def"
+require "masamune-ast/abstract_syntax_tree/do_block"
+require "masamune-ast/abstract_syntax_tree/params"
 require "masamune-ast/abstract_syntax_tree/program"
 require "masamune-ast/abstract_syntax_tree/string_content"
 require "masamune-ast/abstract_syntax_tree/var_field"
