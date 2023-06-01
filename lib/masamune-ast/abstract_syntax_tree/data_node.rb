@@ -16,6 +16,13 @@ module Masamune
       def position_and_token
         [@line_position, @token]
       end
+
+      # TODO: Write this method.
+      # Results here represent the data we get when searching for data.
+      # For example, [[[4, 7], "ruby"], [[7, 7], "rails"]].
+      def self.order_results_by_position(position_and_token_ary)
+        position_and_token_ary
+      end
     end
   end
 end
