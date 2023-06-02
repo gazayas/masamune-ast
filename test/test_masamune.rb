@@ -4,14 +4,14 @@ require "test_helper"
 
 class TestMasamune< Minitest::Test
   def test_find_variable
-    similar_identifiers = <<~CODE
+    similar_tokens = <<~CODE
       java = "java"
       javascript = java + "script"
       p java
       # java (Doesn't pick up comments)
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
+    msmn = Masamune::AbstractSyntaxTree.new(similar_tokens)
     assert msmn.variables.size == 4
     assert msmn.variables(name: "java").size == 3
     assert msmn.variables(name: "javascript").size == 1
@@ -78,19 +78,17 @@ class TestMasamune< Minitest::Test
     assert msmn.block_params.last == [[11, 23], "v"]
   end
 
-=begin
   def test_lex_nodes_return_proper_type
-    similar_identifiers = <<~CODE
+    similar_tokens = <<~CODE
       java = "java"
       javascript = java + "script"
       p java
       # java (Doesn't pick up comments)
     CODE
 
-    msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
-    assert msmn.lex_nodes.first.is_variable?
-    refute msmn.lex_nodes.first.is_method?
-    refute msmn.lex_nodes.first.is_string?
+    msmn = Masamune::AbstractSyntaxTree.new(similar_tokens)
+    assert msmn.lex_nodes.first.variable?
+    refute msmn.lex_nodes.first.method?
+    refute msmn.lex_nodes.first.string?
   end
-=end
 end
