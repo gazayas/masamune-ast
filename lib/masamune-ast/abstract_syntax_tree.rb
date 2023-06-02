@@ -78,6 +78,7 @@ module Masamune
       find_nodes(get_node_class(:params))
     end
 
+    # TODO: Create an option to return a list of DataNode class instances.
     def find_nodes(token_classes, token: nil)
       # Ensure the classes are in an array
       token_classes = [token_classes].flatten
