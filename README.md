@@ -34,6 +34,10 @@ msmn.variables
 #=> {:position=>[3, 5], :token=>"java"},
 #=> {:position=>[3, 25], :token=>"javascript"}]
 
+msmn.strings
+#=> [{:position=>[1, 8], :token=>"java"},
+#=> {:position=>[2, 21], :token=>"script"},
+#=> {:position=>[3, 13], :token=>" is not "}]
 
 msmn.variables(name: "java")
 #=> [{position: [1, 0], token: "java"},
@@ -71,7 +75,7 @@ msmn.method_definitions
 #=> [{:position=>[6, 4], :token=>"foo"}]
 ```
 
-In some cases, it can be easier to look at the given lex nodes to analyze your source code:
+In some cases, it can be easier to look at the given lex nodes to analyze your source code since you can easily see the index and the line position it's on:
 ```ruby
 msmn.lex_nodes
 => [#<Masamune::LexNode:0x00007fd61810cac0 @ast_id=1200, @index=0, @position=[1, 0], @state=CMDARG, @token="java", @type=:ident>,
