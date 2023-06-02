@@ -42,15 +42,15 @@ module Masamune
         :var_ref,
         :params
       ].map {|type| get_node_class(type)}
-      find_nodes(var_classes, identifier: name)
+      find_nodes(var_classes, token: name)
     end
 
     def strings(content: nil)
-      find_nodes(get_node_class(:string_content), identifier: content)
+      find_nodes(get_node_class(:string_content), token: content)
     end
 
     def method_definitions(name: nil)
-      find_nodes(get_node_class(:def), identifier: name)
+      find_nodes(get_node_class(:def), token: name)
     end
 
     def method_calls(name: nil)
@@ -58,7 +58,7 @@ module Masamune
         :vcall,
         :call
       ].map {|type| get_node_class(type)}
-      find_nodes(method_classes, identifier: name)
+      find_nodes(method_classes, token: name)
     end
 
     # TODO
@@ -78,13 +78,12 @@ module Masamune
       find_nodes(get_node_class(:params))
     end
 
-    # TODO: Change `identifier` to `token`.
-    def find_nodes(identifier_classes, identifier: nil)
+    def find_nodes(token_classes, token: nil)
       # Ensure the classes are in an array
-      identifier_classes = [identifier_classes].flatten
+      token_classes = [token_classes].flatten
 
       var_nodes = []
-      identifier_classes.each do |klass|
+      token_classes.each do |klass|
         var_nodes << @node_list.select {|node| node.class == klass}
       end
 
@@ -92,8 +91,8 @@ module Masamune
       # so we ensure everything is flattened out before moving forward.
       var_nodes.flatten!
 
-      if identifier
-        var_nodes = var_nodes.select {|node| node.data_nodes.first.token == identifier}.flatten
+      if token
+        var_nodes = var_nodes.select {|node| node.data_nodes.first.token == token}.flatten
       end
 
       final_result = []
