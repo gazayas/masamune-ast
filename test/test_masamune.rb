@@ -65,7 +65,7 @@ class TestMasamune< Minitest::Test
     methods = msmn.all_methods
     assert methods.size == 5
 
-    method_names = methods.map {|m| m.last}
+    method_names = methods.map {|m| m[:token]}
     assert method_names.include?("sum")
     assert method_names.include?("times")
 
@@ -74,8 +74,8 @@ class TestMasamune< Minitest::Test
 
     # Check block params and their line positions.
     assert msmn.block_params.size == 4
-    assert msmn.block_params.first == [[4, 18], "n"]
-    assert msmn.block_params.last == [[11, 23], "v"]
+    assert msmn.block_params.first == {position: [4, 18], token: "n"}
+    assert msmn.block_params.last == {position: [11, 23], token: "v"}
   end
 
   def test_lex_nodes_return_proper_type
