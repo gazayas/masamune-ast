@@ -13,6 +13,11 @@ Or add the following to your Gemfile and run `bundle install`
 gem "masamune-ast"
 ```
 
+Then require the gem in a file like this:
+```ruby
+require "masamune"
+```
+
 ## Usage
 
 Pinpoint variables and methods in your source code even when other tokens have the same or similar spelling:
