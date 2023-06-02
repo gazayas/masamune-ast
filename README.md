@@ -26,7 +26,6 @@ CODE
 
 msmn = Masamune::AbstractSyntaxTree.new(code)
 
-# Retrieve all the variables on the lines they are on.
 msmn.variables
 #=> [{:position=>[1, 0], :token=>"java"},
 #=> {:position=>[2, 0], :token=>"javascript"},
