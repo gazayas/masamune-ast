@@ -78,7 +78,6 @@ class TestMasamune< Minitest::Test
     assert msmn.block_params.last == [[11, 23], "v"]
   end
 
-=begin
   def test_lex_nodes_return_proper_type
     similar_identifiers = <<~CODE
       java = "java"
@@ -88,9 +87,8 @@ class TestMasamune< Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(similar_identifiers)
-    assert msmn.lex_nodes.first.is_variable?
-    refute msmn.lex_nodes.first.is_method?
-    refute msmn.lex_nodes.first.is_string?
+    assert msmn.lex_nodes.first.variable?
+    refute msmn.lex_nodes.first.method?
+    refute msmn.lex_nodes.first.string?
   end
-=end
 end

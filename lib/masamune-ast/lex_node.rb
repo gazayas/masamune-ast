@@ -23,30 +23,31 @@ module Masamune
       ObjectSpace._id2ref(@ast_id)
     end
 
-    def is_variable?
-      return false unless is_identifier?
-      ast.search(:variable, @token).any?
+    def variable?
+      return false unless identifier?
+      ast.variables(name: @token).any?
     end
 
-    def is_method?
-      return false unless is_identifier?
-      is_method_definition? || is_method_call?
+    def method_definition?
+      ast.method_definitions(name: @token).any?
     end
 
-    def is_method_definition?
-      ast.search(:def, @token).any?
+    def method_call?
+      ast.method_calls(name: @token).any?
     end
 
-    def is_method_call?
-      ast.search(:method_call, @token).any?
+    def method?
+      return false unless identifier?
+      method_definition? || method_call?
     end
 
-    def is_identifier?
-      type == :ident
+    # TODO: I'm not sure how I feel about checking @type against the symbol directly.
+    def identifier?
+      @type == :ident
     end
 
-    def is_string?
-      type == :tstring_content
+    def string?
+      @type == :tstring_content
     end
   end
 end
