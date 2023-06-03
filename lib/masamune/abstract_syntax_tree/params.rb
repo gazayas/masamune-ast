@@ -14,7 +14,7 @@ module Masamune
         # to ensure that it's being handled properly.
         unless @contents[1].nil?
           @contents[1].map do |content|
-            Masamune::AbstractSyntaxTree::DataNode.new(content, @ast_id)
+            DataNode.new(content, @ast_id)
           end
         end
       end

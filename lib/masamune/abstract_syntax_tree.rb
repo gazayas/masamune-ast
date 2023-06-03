@@ -8,7 +8,7 @@ module Masamune
       @tree = Ripper.sexp(code)
       raw_lex_nodes = Ripper.lex(code)
       @lex_nodes = raw_lex_nodes.map do |lex_node|
-        Masamune::LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
+        LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
       end
 
       @node_list = []
@@ -22,7 +22,7 @@ module Masamune
         msmn_node = klass.new(tree_node, self.__id__)
       else
         # Create a general node if the node is a single value.
-        msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+        msmn_node = Node.new(tree_node, self.__id__)
       end
 
       # Register nodes and any data nodes housed within it.
@@ -84,26 +84,27 @@ module Masamune
       # Ensure the classes are in an array
       token_classes = [token_classes].flatten
 
-      # TODO: This shouldn't be var_nodes, it should be something more general.
-      var_nodes = []
+      nodes = []
       token_classes.each do |klass|
-        var_nodes << @node_list.select {|node| node.class == klass}
+        nodes << @node_list.select {|node| node.class == klass}
       end
 
       # Searching for multiple classes will yield multi-dimensional arrays,
       # so we ensure everything is flattened out before moving forward.
-      var_nodes.flatten!
+      nodes.flatten!
 
       if token
-        var_nodes = var_nodes.select {|node| node.data_nodes.first.token == token}.flatten
+        # TODO: This most likely shouldn't be `node.data_nodes.first`.
+        # There are probably more data_nodes we need to check depending on the node class.
+        nodes = nodes.select {|node| node.data_nodes.first.token == token}.flatten
       end
 
       final_result = []
-      var_nodes.each do |node|
+      nodes.each do |node|
         node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
       end
 
-      Masamune::AbstractSyntaxTree::DataNode.order_results_by_position(final_result)
+      DataNode.order_results_by_position(final_result)
     end
 
     def replace(type:, old_token:, new_token:)
@@ -120,12 +121,11 @@ module Masamune
 
     def get_node_class(type)
       begin
-        class_name = "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}"
-        klass = class_name.constantize
+        "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}".constantize
       rescue NameError
         # For all other nodes that we haven't covered yet, we just make a general class.
         # We can worry about adding the classes for other nodes as we go.
-        msmn_node = Masamune::AbstractSyntaxTree::Node
+        Node
       end
     end
   end

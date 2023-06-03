@@ -9,7 +9,7 @@ module Masamune
 
       def extract_data_nodes
         [
-          Masamune::AbstractSyntaxTree::DataNode.new(@contents.last, @ast_id)
+          DataNode.new(@contents.last, @ast_id)
         ]
       end
     end
