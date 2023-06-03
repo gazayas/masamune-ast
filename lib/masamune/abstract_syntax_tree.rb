@@ -1,9 +1,10 @@
 module Masamune
   class AbstractSyntaxTree
-    attr_reader :tree
+    attr_reader :code, :tree, :slasher
     attr_accessor :node_list, :data_node_list, :lex_nodes
 
     def initialize(code)
+      @code = code
       @tree = Ripper.sexp(code)
       raw_lex_nodes = Ripper.lex(code)
       @lex_nodes = raw_lex_nodes.map do |lex_node|
@@ -83,6 +84,7 @@ module Masamune
       # Ensure the classes are in an array
       token_classes = [token_classes].flatten
 
+      # TODO: This shouldn't be var_nodes, it should be something more general.
       var_nodes = []
       token_classes.each do |klass|
         var_nodes << @node_list.select {|node| node.class == klass}
@@ -98,10 +100,20 @@ module Masamune
 
       final_result = []
       var_nodes.each do |node|
-        node.data_nodes.each {|dn| final_result << dn.position_and_token}
+        node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
       end
 
       Masamune::AbstractSyntaxTree::DataNode.order_results_by_position(final_result)
+    end
+
+    def replace(type:, old_token:, new_token:)
+      Slasher.replace(
+        type: type,
+        old_token: old_token,
+        new_token: new_token,
+        code: @code,
+        ast: self
+      )
     end
 
     private
