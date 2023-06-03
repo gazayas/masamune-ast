@@ -120,8 +120,7 @@ module Masamune
 
     def get_node_class(type)
       begin
-        class_name = "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}"
-        klass = class_name.constantize
+        "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}".constantize
       rescue NameError
         # For all other nodes that we haven't covered yet, we just make a general class.
         # We can worry about adding the classes for other nodes as we go.
