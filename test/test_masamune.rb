@@ -78,6 +78,20 @@ class TestMasamune < Minitest::Test
     assert msmn.block_params.last == {position: [11, 23], token: "v"}
   end
 
+  def test_find_comments
+    comments = <<~CODE
+      # First comment
+      # Second comment
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(comments)
+
+    # Comments don't have a data node in @tree.
+    assert msmn.data_node_list.empty?
+    assert msmn.comments.size == 2
+    assert msmn.comments.first[:token] == "# First comment\n"
+  end
+
   def test_lex_nodes_return_proper_type
     similar_tokens = <<~CODE
       java = "java"
