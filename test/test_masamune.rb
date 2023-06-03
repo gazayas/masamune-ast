@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class TestMasamune< Minitest::Test
+class TestMasamune < Minitest::Test
   def test_find_variable
     similar_tokens = <<~CODE
       java = "java"
