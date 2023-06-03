@@ -70,6 +70,14 @@ module Masamune
     def brace_block_params
     end
 
+    # @tree only shows comments as a type of `:void_stmt` and
+    # doesn't have a data node, so we get comments from @lex_nodes.
+    def comments(content: nil)
+      comments = @lex_nodes.select {|node| node.type == :comment}
+      comments.select {|comment| comment.token == content} if content
+      comments.map {|comment| {position: comment.position, token: comment.token}}
+    end
+
     def all_methods
       method_definitions + method_calls
     end
