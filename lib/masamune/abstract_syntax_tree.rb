@@ -8,7 +8,7 @@ module Masamune
       @tree = Ripper.sexp(code)
       raw_lex_nodes = Ripper.lex(code)
       @lex_nodes = raw_lex_nodes.map do |lex_node|
-        Masamune::LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
+        LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
       end
 
       @node_list = []
@@ -22,7 +22,7 @@ module Masamune
         msmn_node = klass.new(tree_node, self.__id__)
       else
         # Create a general node if the node is a single value.
-        msmn_node = Masamune::AbstractSyntaxTree::Node.new(tree_node, self.__id__)
+        msmn_node = Node.new(tree_node, self.__id__)
       end
 
       # Register nodes and any data nodes housed within it.
@@ -103,7 +103,7 @@ module Masamune
         node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
       end
 
-      Masamune::AbstractSyntaxTree::DataNode.order_results_by_position(final_result)
+      DataNode.order_results_by_position(final_result)
     end
 
     def replace(type:, old_token:, new_token:)
@@ -124,7 +124,7 @@ module Masamune
       rescue NameError
         # For all other nodes that we haven't covered yet, we just make a general class.
         # We can worry about adding the classes for other nodes as we go.
-        msmn_node = Masamune::AbstractSyntaxTree::Node
+        Node
       end
     end
   end

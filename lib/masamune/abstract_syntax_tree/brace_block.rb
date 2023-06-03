@@ -11,7 +11,7 @@ module Masamune
 
       def params
         # This node should exist already, so we search for it in the ast object.
-        block_var = Masamune::AbstractSyntaxTree::BlockVar.new(contents[1], ast_id)
+        block_var = BlockVar.new(contents[1], ast_id)
         ast.node_list.find {|node| node.contents == block_var.contents}
       end
     end

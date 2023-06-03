@@ -14,7 +14,7 @@ module Masamune
       # nice to find out and implement it document/implement it somewhere.
       def extract_data_nodes
         @contents[1][1].map do |content|
-          Masamune::AbstractSyntaxTree::DataNode.new(content, @ast_id)
+          DataNode.new(content, @ast_id)
         end
       end
     end
