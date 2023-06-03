@@ -20,6 +20,31 @@ require "masamune"
 
 ## Usage
 
+Isolate and replace variables, methods, or strings in your Ruby source code according to the specific tokens allotted when the code is intially parsed:
+```ruby
+code = <<~CODE
+  10.times do |n|
+    puts n
+  end
+
+  def n
+    "n"
+  end
+CODE
+
+msmn = Masamune::AbstractSyntaxTree.new(code)
+msmn.replace(type: :variables, old_token: "n", new_token: "foo")
+
+# This will produce the following code in string form.
+10.times do |foo|
+  puts foo
+end
+
+def n
+  "n"
+end
+```
+
 Pinpoint variables and methods in your source code even when other tokens have the same or similar spelling:
 ```ruby
 code = <<CODE
