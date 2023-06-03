@@ -1,6 +1,6 @@
 module Masamune
   class AbstractSyntaxTree
-    attr_reader :code, :tree, :slasher
+    attr_reader :code, :tree
     attr_accessor :node_list, :data_node_list, :lex_nodes
 
     def initialize(code)
