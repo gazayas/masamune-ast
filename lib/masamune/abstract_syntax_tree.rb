@@ -84,22 +84,23 @@ module Masamune
       # Ensure the classes are in an array
       token_classes = [token_classes].flatten
 
-      # TODO: This shouldn't be var_nodes, it should be something more general.
-      var_nodes = []
+      nodes = []
       token_classes.each do |klass|
-        var_nodes << @node_list.select {|node| node.class == klass}
+        nodes << @node_list.select {|node| node.class == klass}
       end
 
       # Searching for multiple classes will yield multi-dimensional arrays,
       # so we ensure everything is flattened out before moving forward.
-      var_nodes.flatten!
+      nodes.flatten!
 
       if token
-        var_nodes = var_nodes.select {|node| node.data_nodes.first.token == token}.flatten
+        # TODO: This most likely shouldn't be `node.data_nodes.first`.
+        # There are probably more data_nodes we need to check depending on the node class.
+        nodes = nodes.select {|node| node.data_nodes.first.token == token}.flatten
       end
 
       final_result = []
-      var_nodes.each do |node|
+      nodes.each do |node|
         node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
       end
 
