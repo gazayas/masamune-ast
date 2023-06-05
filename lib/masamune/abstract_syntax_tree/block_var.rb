@@ -11,7 +11,7 @@ module Masamune
 
       # :block_var has a lot of nil values within in.
       # I'm not sure what this represents, but it would be
-      # nice to find out and implement it document/implement it somewhere.
+      # nice to find out and document/implement it somewhere.
       def extract_data_nodes
         @contents[1][1].map do |content|
           DataNode.new(content, @ast_id)

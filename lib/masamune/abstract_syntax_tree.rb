@@ -70,6 +70,18 @@ module Masamune
     def brace_block_params
     end
 
+    def symbols(content: nil)
+      symbol_literals + string_symbols
+    end
+
+    def symbol_literals(content: nil)
+      find_nodes(get_node_class(:symbol_literal), token: content)
+    end
+
+    def string_symbols(content: nil)
+      find_nodes(get_node_class(:dyna_symbol), token: content)
+    end
+
     # @tree only shows comments as a type of `:void_stmt` and
     # doesn't have a data node, so we get comments from @lex_nodes.
     def comments(content: nil)
@@ -109,7 +121,13 @@ module Masamune
 
       final_result = []
       nodes.each do |node|
-        node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
+        # Data for symbols are housed within a nested node, so we handle those differently here.
+        # Read the comments for `get_symbol_data` in the symbol node classes for details.
+        if node.class == Masamune::AbstractSyntaxTree::SymbolLiteral || node.class == Masamune::AbstractSyntaxTree::DynaSymbol
+          final_result << node.get_symbol_data.position_and_token
+        else
+          node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
+        end
       end
 
       DataNode.order_results_by_position(final_result)

@@ -92,6 +92,32 @@ class TestMasamune < Minitest::Test
     assert msmn.comments.first[:token] == "# First comment\n"
   end
 
+  def test_find_symbols
+    symbol_literals = <<~CODE
+      "foo"
+      :foo
+      :bar
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(symbol_literals)
+    assert msmn.symbols.size == 2
+    assert msmn.symbols.first == {position: [2, 1], token: "foo"}
+    assert msmn.symbols.last == {position: [3, 1], token: "bar"}
+
+    x = "foo"
+    y = "bar"
+    string_symbols = <<~CODE
+      :"#{x}_#{y}"
+      :not_a_string_symbol
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(string_symbols)
+    assert msmn.symbols.size == 2
+    assert msmn.string_symbols.size == 1
+    assert msmn.string_symbols.first[:position] == [1, 2]
+    assert msmn.string_symbols.first[:token] == "foo_bar"
+  end
+
   def test_lex_nodes_return_proper_type
     similar_tokens = <<~CODE
       java = "java"
