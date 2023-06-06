@@ -1,4 +1,4 @@
-# Program represents the top layer of the AST,
+# Program represents the top layer of the abstract syntax tree,
 # and the second element of the array houses the entire program.
 
 module Masamune
