@@ -139,10 +139,9 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(vars)
-    data_nodes = msmn.strings(data_nodes: true)
-    assert data_nodes.first.class == Masamune::AbstractSyntaxTree::DataNode
-    assert data_nodes.size == 2
-    assert data_nodes.first.position_and_token[:position] == [1, 1]
+    nodes = msmn.strings(result_type: :nodes)
+    assert nodes.size == 2
+    assert nodes.first.data_nodes.first.position_and_token[:position] == [1, 1]
   end
 
   def test_order_results
