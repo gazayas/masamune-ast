@@ -15,7 +15,7 @@ class TestSlasher < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(code)
-    new_code = msmn.replace(type: :variables, old_token: "n", new_token: "foo")
+    new_code = msmn.replace(type: :variable, old_token: "n", new_token: "foo")
     expected_code = <<~CODE
       10.times do |foo|
         puts foo
