@@ -11,6 +11,7 @@ require "masamune/abstract_syntax_tree/data_node"
 
 require "masamune/abstract_syntax_tree/nodes/blocks/brace_block"
 require "masamune/abstract_syntax_tree/nodes/blocks/do_block"
+require "masamune/abstract_syntax_tree/nodes/support_nodes/comment"
 require "masamune/abstract_syntax_tree/nodes/symbols/dyna_symbol"
 require "masamune/abstract_syntax_tree/nodes/symbols/symbol_literal"
 require "masamune/abstract_syntax_tree/nodes/variables/block_var"
