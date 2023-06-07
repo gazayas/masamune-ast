@@ -33,7 +33,7 @@ code = <<~CODE
 CODE
 
 msmn = Masamune::AbstractSyntaxTree.new(code)
-msmn.replace(type: :variables, old_token: "n", new_token: "foo")
+msmn.replace(type: :variable, old_token: "n", new_token: "foo")
 
 # This will produce the following code in string form.
 10.times do |foo|

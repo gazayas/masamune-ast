@@ -3,8 +3,9 @@ module Masamune
     def self.replace(type:, old_token:, new_token:, code:, ast:)
       # `type` can either be a method from the ast like `method_definitions`,
       # or it can be a list of Masamune::AbstractSyntaxTree node classes.
-      position_and_token_ary = if type.is_a?(Symbol) && ast.respond_to?(type)
-        ast.send(type)
+      position_and_token_ary = if type.is_a?(Symbol)
+        type_to_method = type.to_s.pluralize.to_sym
+        ast.send(type_to_method)
       elsif type.is_a?(Array)
         type.map {|klass| ast.find_nodes(klass)}.flatten
       end
