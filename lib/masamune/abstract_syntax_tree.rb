@@ -48,29 +48,29 @@ module Masamune
     end
 
     # TODO: Add block_params: true to the arguments.
-    def variables(name: nil)
+    def variables(name: nil, data_nodes: false)
       var_classes = [
         :var_field,
         :var_ref,
         :params
       ].map {|type| get_node_class(type)}
-      find_nodes(var_classes, token: name)
+      find_nodes(var_classes, token: name, data_nodes: data_nodes)
     end
 
-    def strings(content: nil)
-      find_nodes(get_node_class(:string_content), token: content)
+    def strings(content: nil, data_nodes: false)
+      find_nodes(get_node_class(:string_content), token: content, data_nodes: data_nodes)
     end
 
-    def method_definitions(name: nil)
-      find_nodes(get_node_class(:def), token: name)
+    def method_definitions(name: nil, data_nodes: false)
+      find_nodes(get_node_class(:def), token: name, data_nodes: data_nodes)
     end
 
-    def method_calls(name: nil)
+    def method_calls(name: nil, data_nodes: false)
       method_classes = [
         :vcall,
         :call
       ].map {|type| get_node_class(type)}
-      find_nodes(method_classes, token: name)
+      find_nodes(method_classes, token: name, data_nodes: data_nodes)
     end
 
     # TODO
@@ -81,33 +81,32 @@ module Masamune
     def brace_block_params
     end
 
-    def symbols(content: nil)
-      symbol_literals + string_symbols
+    def symbols(content: nil, data_nodes: false)
+      symbol_literals(content: content, data_nodes: data_nodes) + string_symbols(content: content, data_nodes: data_nodes)
     end
 
-    def symbol_literals(content: nil)
-      find_nodes(get_node_class(:symbol_literal), token: content)
+    def symbol_literals(content: nil, data_nodes: false)
+      find_nodes(get_node_class(:symbol_literal), token: content, data_nodes: data_nodes)
     end
 
-    def string_symbols(content: nil)
-      find_nodes(get_node_class(:dyna_symbol), token: content)
+    def string_symbols(content: nil, data_nodes: false)
+      find_nodes(get_node_class(:dyna_symbol), token: content, data_nodes: data_nodes)
     end
 
-    def comments(content: nil)
-      find_nodes(get_node_class(:comment), token: content)
+    def comments(content: nil, data_nodes: false)
+      find_nodes(get_node_class(:comment), token: content, data_nodes: false)
     end
 
-    def all_methods
-      method_definitions + method_calls
+    def all_methods(name: nil, data_nodes: false)
+      method_definitions(name: name, data_nodes: data_nodes) + method_calls(name: name, data_nodes: data_nodes)
     end
 
-    def block_params
+    def block_params(content: nil, data_nodes: false)
       # TODO: do_block_params + brace_block_params
-      find_nodes(get_node_class(:params))
+      find_nodes(get_node_class(:params), token: content, data_nodes: data_nodes)
     end
 
-    # TODO: Create an option to return a list of DataNode class instances.
-    def find_nodes(token_classes, token: nil)
+    def find_nodes(token_classes, token: nil, data_nodes: false)
       # Ensure the classes are in an array
       token_classes = [token_classes].flatten
 
@@ -135,13 +134,16 @@ module Masamune
         # Data for symbols are housed within a nested node, so we handle those differently here.
         # Read the comments for `get_symbol_data` in the symbol node classes for details.
         if node.class == Masamune::AbstractSyntaxTree::SymbolLiteral || node.class == Masamune::AbstractSyntaxTree::DynaSymbol
-          final_result << node.get_symbol_data.position_and_token
+          final_result << (data_nodes ? node : node.get_symbol_data.position_and_token)
         else
-          node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
+          node.data_nodes.each {|dn| final_result << (data_nodes ? dn : dn.position_and_token)} if node.data_nodes
         end
       end
 
-      DataNode.order_results_by_position(final_result)
+      # Only order the information if we're returning hashes.
+      # TODO: We might want to change the placement of order_results_by_position
+      # if the operation is being done against hashes and not data nodes.
+      data_nodes ? final_result : DataNode.order_results_by_position(final_result)
     end
 
     def replace(type:, old_token:, new_token:)

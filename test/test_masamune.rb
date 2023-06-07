@@ -131,4 +131,17 @@ class TestMasamune < Minitest::Test
     refute msmn.lex_nodes.first.method?
     refute msmn.lex_nodes.first.string?
   end
+
+  def test_return_data_nodes
+    vars = <<~CODE
+      "foo"
+      "bar"
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(vars)
+    data_nodes = msmn.strings(data_nodes: true)
+    assert data_nodes.first.class == Masamune::AbstractSyntaxTree::DataNode
+    assert data_nodes.size == 2
+    assert data_nodes.first.position_and_token[:position] == [1, 1]
+  end
 end
