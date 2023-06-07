@@ -54,15 +54,18 @@ module Masamune
         :var_ref,
         :params
       ].map {|type| get_node_class(type)}
-      find_nodes(var_classes, token: name, data_nodes: data_nodes)
+      results = find_nodes(var_classes, token: name, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def strings(content: nil, data_nodes: false)
-      find_nodes(get_node_class(:string_content), token: content, data_nodes: data_nodes)
+      results = find_nodes(get_node_class(:string_content), token: content, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def method_definitions(name: nil, data_nodes: false)
-      find_nodes(get_node_class(:def), token: name, data_nodes: data_nodes)
+      results = find_nodes(get_node_class(:def), token: name, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def method_calls(name: nil, data_nodes: false)
@@ -70,7 +73,8 @@ module Masamune
         :vcall,
         :call
       ].map {|type| get_node_class(type)}
-      find_nodes(method_classes, token: name, data_nodes: data_nodes)
+      results = find_nodes(method_classes, token: name, data_nodes: data_nodes)
+      order_results(results)
     end
 
     # TODO
@@ -82,28 +86,34 @@ module Masamune
     end
 
     def symbols(content: nil, data_nodes: false)
-      symbol_literals(content: content, data_nodes: data_nodes) + string_symbols(content: content, data_nodes: data_nodes)
+      results = symbol_literals(content: content, data_nodes: data_nodes) + string_symbols(content: content, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def symbol_literals(content: nil, data_nodes: false)
-      find_nodes(get_node_class(:symbol_literal), token: content, data_nodes: data_nodes)
+      results = find_nodes(get_node_class(:symbol_literal), token: content, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def string_symbols(content: nil, data_nodes: false)
-      find_nodes(get_node_class(:dyna_symbol), token: content, data_nodes: data_nodes)
+      results = find_nodes(get_node_class(:dyna_symbol), token: content, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def comments(content: nil, data_nodes: false)
-      find_nodes(get_node_class(:comment), token: content, data_nodes: false)
+      results = find_nodes(get_node_class(:comment), token: content, data_nodes: false)
+      order_results(results)
     end
 
     def all_methods(name: nil, data_nodes: false)
-      method_definitions(name: name, data_nodes: data_nodes) + method_calls(name: name, data_nodes: data_nodes)
+      results = method_definitions(name: name, data_nodes: data_nodes) + method_calls(name: name, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def block_params(content: nil, data_nodes: false)
       # TODO: do_block_params + brace_block_params
-      find_nodes(get_node_class(:params), token: content, data_nodes: data_nodes)
+      results = find_nodes(get_node_class(:params), token: content, data_nodes: data_nodes)
+      order_results(results)
     end
 
     def find_nodes(token_classes, token: nil, data_nodes: false)
@@ -165,6 +175,16 @@ module Masamune
         # For all other nodes that we haven't covered yet, we just make a general class.
         # We can worry about adding the classes for other nodes as we go.
         Node
+      end
+    end
+
+    # We only order results when they are a Hash
+    # i.e. - {position: [4, 7], token: "project"}
+    def order_results(results)
+      if results.first.is_a?(Hash)
+        DataNode.order_results_by_position(results)
+      else
+        results
       end
     end
   end

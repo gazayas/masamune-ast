@@ -144,4 +144,35 @@ class TestMasamune < Minitest::Test
     assert data_nodes.size == 2
     assert data_nodes.first.position_and_token[:position] == [1, 1]
   end
+
+  def test_order_results
+    code = <<~CODE
+      ary = [1, 2, 3]
+      ary.sum.times do |n|
+        puts n
+      end
+
+      def foo
+      end
+      foo
+      foo # Call again
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(code)
+
+    # Since `all_methods` combines two searches
+    # (`method_definitions` and `method_calls`),
+    # we ensure these results are ordered with
+    # order_results(results).
+    results = msmn.all_methods
+    expected_results = [
+      {:position=>[2, 4], :token=>"sum"},
+      {:position=>[2, 8], :token=>"times"},
+      {:position=>[6, 4], :token=>"foo"},
+      {:position=>[8, 0], :token=>"foo"},
+      {:position=>[9, 0], :token=>"foo"}
+    ]
+
+    assert_equal expected_results, results
+  end
 end
