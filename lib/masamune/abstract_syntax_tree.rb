@@ -47,33 +47,36 @@ module Masamune
       @comment_list.flatten!
     end
 
+    # TODO: A lot of these methods have the same content,
+    # so I want to come up with a way to refactor these.
+
     # TODO: Add block_params: true to the arguments.
-    def variables(name: nil, data_nodes: false)
+    def variables(name: nil, result_type: Hash)
       var_classes = [
         :var_field,
         :var_ref,
         :params
       ].map {|type| get_node_class(type)}
-      results = find_nodes(var_classes, token: name, data_nodes: data_nodes)
+      results = find_nodes(var_classes, token: name, result_type: result_type)
       order_results(results)
     end
 
-    def strings(content: nil, data_nodes: false)
-      results = find_nodes(get_node_class(:string_content), token: content, data_nodes: data_nodes)
+    def strings(content: nil, result_type: Hash)
+      results = find_nodes(get_node_class(:string_content), token: content, result_type: result_type)
       order_results(results)
     end
 
-    def method_definitions(name: nil, data_nodes: false)
-      results = find_nodes(get_node_class(:def), token: name, data_nodes: data_nodes)
+    def method_definitions(name: nil, result_type: Hash)
+      results = find_nodes(get_node_class(:def), token: name, result_type: result_type)
       order_results(results)
     end
 
-    def method_calls(name: nil, data_nodes: false)
+    def method_calls(name: nil, result_type: Hash)
       method_classes = [
         :vcall,
         :call
       ].map {|type| get_node_class(type)}
-      results = find_nodes(method_classes, token: name, data_nodes: data_nodes)
+      results = find_nodes(method_classes, token: name, result_type: result_type)
       order_results(results)
     end
 
@@ -85,38 +88,38 @@ module Masamune
     def brace_block_params
     end
 
-    def symbols(content: nil, data_nodes: false)
-      results = symbol_literals(content: content, data_nodes: data_nodes) + string_symbols(content: content, data_nodes: data_nodes)
+    def symbols(content: nil, result_type: Hash)
+      results = symbol_literals(content: content, result_type: result_type) + string_symbols(content: content, result_type: result_type)
       order_results(results)
     end
 
-    def symbol_literals(content: nil, data_nodes: false)
-      results = find_nodes(get_node_class(:symbol_literal), token: content, data_nodes: data_nodes)
+    def symbol_literals(content: nil, result_type: Hash)
+      results = find_nodes(get_node_class(:symbol_literal), token: content, result_type: result_type)
       order_results(results)
     end
 
-    def string_symbols(content: nil, data_nodes: false)
-      results = find_nodes(get_node_class(:dyna_symbol), token: content, data_nodes: data_nodes)
+    def string_symbols(content: nil, result_type: Hash)
+      results = find_nodes(get_node_class(:dyna_symbol), token: content, result_type: result_type)
       order_results(results)
     end
 
-    def comments(content: nil, data_nodes: false)
-      results = find_nodes(get_node_class(:comment), token: content, data_nodes: false)
+    def comments(content: nil, result_type: Hash)
+      results = find_nodes(get_node_class(:comment), token: content, result_type: result_type)
       order_results(results)
     end
 
-    def all_methods(name: nil, data_nodes: false)
-      results = method_definitions(name: name, data_nodes: data_nodes) + method_calls(name: name, data_nodes: data_nodes)
+    def all_methods(name: nil, result_type: Hash)
+      results = method_definitions(name: name, result_type: result_type) + method_calls(name: name, result_type: result_type)
       order_results(results)
     end
 
-    def block_params(content: nil, data_nodes: false)
+    def block_params(content: nil, result_type: Hash)
       # TODO: do_block_params + brace_block_params
-      results = find_nodes(get_node_class(:params), token: content, data_nodes: data_nodes)
+      results = find_nodes(get_node_class(:params), token: content, result_type: result_type)
       order_results(results)
     end
 
-    def find_nodes(token_classes, token: nil, data_nodes: false)
+    def find_nodes(token_classes, token: nil, result_type: Hash)
       # Ensure the classes are in an array
       token_classes = [token_classes].flatten
 
@@ -133,6 +136,8 @@ module Masamune
       # so we ensure everything is flattened out before moving forward.
       nodes.flatten!
 
+      return nodes if result_type == :nodes
+
       if token
         # TODO: This most likely shouldn't be `node.data_nodes.first`.
         # There are probably more data_nodes we need to check depending on the node class.
@@ -144,16 +149,16 @@ module Masamune
         # Data for symbols are housed within a nested node, so we handle those differently here.
         # Read the comments for `get_symbol_data` in the symbol node classes for details.
         if node.class == Masamune::AbstractSyntaxTree::SymbolLiteral || node.class == Masamune::AbstractSyntaxTree::DynaSymbol
-          final_result << (data_nodes ? node : node.get_symbol_data.position_and_token)
+          final_result << node.get_symbol_data.position_and_token
         else
-          node.data_nodes.each {|dn| final_result << (data_nodes ? dn : dn.position_and_token)} if node.data_nodes
+          node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
         end
       end
 
       # Only order the information if we're returning hashes.
       # TODO: We might want to change the placement of order_results_by_position
       # if the operation is being done against hashes and not data nodes.
-      data_nodes ? final_result : DataNode.order_results_by_position(final_result)
+      nodes.first.class.is_a?(Hash) ? DataNode.order_results_by_position(final_result) : final_result
     end
 
     def replace(type:, old_token:, new_token:)
@@ -178,7 +183,8 @@ module Masamune
       end
     end
 
-    # We only order results when they are a Hash
+    # We only order results when they are a Hash.
+    # The contents from the Hash are pulled from data nodes.
     # i.e. - {position: [4, 7], token: "project"}
     def order_results(results)
       if results.first.is_a?(Hash)
