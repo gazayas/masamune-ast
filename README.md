@@ -104,6 +104,39 @@ msmn.method_definitions
 #=> [{:position=>[6, 4], :token=>"foo"}]
 ```
 
+You can also return the node classes themselves and get the data from there:
+```ruby
+code = <<~CODE
+  "ruby"
+  "rails"
+CODE
+
+msmn = Masamune::AbstractSyntaxTree.new(code)
+msmn.strings(result_type: :nodes)
+#=> [#<Masamune::AbstractSyntaxTree::StringContent:0x00007f6f7c9a6850
+#=>  @ast_id=1440,
+#=>  @contents=[:string_content, [:@tstring_content, "ruby", [1, 1]]],
+#=>  @data_nodes=
+#=>   [#<Masamune::AbstractSyntaxTree::DataNode:0x00007f6f7c9a6828
+#=>     @ast_id=1440,
+#=>     @contents=[:@tstring_content, "ruby", [1, 1]],
+#=>     @data_nodes=nil,
+#=>     @line_position=[1, 1],
+#=>     @token="ruby",
+#=>     @type=:@tstring_content>]>,
+#=> #<Masamune::AbstractSyntaxTree::StringContent:0x00007f6f7c9a5630
+#=>  @ast_id=1440,
+#=>  @contents=[:string_content, [:@tstring_content, "rails", [2, 1]]],
+#=>  @data_nodes=
+#=>   [#<Masamune::AbstractSyntaxTree::DataNode:0x00007f6f7c9a5608
+#=>     @ast_id=1440,
+#=>     @contents=[:@tstring_content, "rails", [2, 1]],
+#=>     @data_nodes=nil,
+#=>     @line_position=[2, 1],
+#=>     @token="rails",
+#=>     @type=:@tstring_content>]>]
+```
+
 In some cases, it can be easier to look at the given lex nodes to analyze your source code since you can easily see the index and the line position it's on:
 ```ruby
 msmn.lex_nodes
