@@ -8,10 +8,11 @@ module Masamune
   class AbstractSyntaxTree
     class Comment < Node
       def initialize(contents, ast_id)
+        super
+
         # Since this is techincally supposed to be a :void_stmt
         # in this ast, we just leave this as nil.
         @contents = nil
-        super
       end
 
       def extract_data_nodes
