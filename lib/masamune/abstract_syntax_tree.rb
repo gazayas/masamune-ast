@@ -1,6 +1,6 @@
 module Masamune
   class AbstractSyntaxTree
-    attr_reader :code, :tree
+    attr_reader :code, :tree, :comment_list
     attr_accessor :node_list, :data_node_list, :lex_nodes
 
     def initialize(code)
@@ -13,7 +13,12 @@ module Masamune
 
       @node_list = []
       @data_node_list = []
+      @comment_list = []
       register_nodes(@tree)
+
+      # Refer to Masamune::AbstractSyntaxTree::Comment
+      # to see why we register these separately.
+      register_comments
     end
 
     def register_nodes(tree_node = self.tree)
@@ -34,6 +39,12 @@ module Masamune
       if !msmn_node.nil? && msmn_node.contents.is_a?(Array)
         msmn_node.contents.each { |node| register_nodes(node) }
       end
+    end
+
+    def register_comments
+      comment_lex_nodes = @lex_nodes.select {|node| node.type == :comment}.flatten
+      @comment_list << comment_lex_nodes.map {|node| Comment.new(node, self.__id__)}
+      @comment_list.flatten!
     end
 
     # TODO: Add block_params: true to the arguments.
@@ -82,12 +93,8 @@ module Masamune
       find_nodes(get_node_class(:dyna_symbol), token: content)
     end
 
-    # @tree only shows comments as a type of `:void_stmt` and
-    # doesn't have a data node, so we get comments from @lex_nodes.
     def comments(content: nil)
-      comments = @lex_nodes.select {|node| node.type == :comment}
-      comments.select {|comment| comment.token == content} if content
-      comments.map {|comment| {position: comment.position, token: comment.token}}
+      find_nodes(get_node_class(:comment), token: content)
     end
 
     def all_methods
@@ -106,7 +113,11 @@ module Masamune
 
       nodes = []
       token_classes.each do |klass|
-        nodes << @node_list.select {|node| node.class == klass}
+        if klass == Masamune::AbstractSyntaxTree::Comment
+          nodes = @comment_list.dup
+        else
+          nodes << @node_list.select {|node| node.class == klass}
+        end
       end
 
       # Searching for multiple classes will yield multi-dimensional arrays,

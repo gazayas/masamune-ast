@@ -9,6 +9,9 @@ require "masamune/abstract_syntax_tree"
 require "masamune/abstract_syntax_tree/node"
 require "masamune/abstract_syntax_tree/data_node"
 
+require "masamune/abstract_syntax_tree/nodes/support_nodes/block"
+require "masamune/abstract_syntax_tree/nodes/support_nodes/comment"
+
 require "masamune/abstract_syntax_tree/nodes/blocks/brace_block"
 require "masamune/abstract_syntax_tree/nodes/blocks/do_block"
 require "masamune/abstract_syntax_tree/nodes/symbols/dyna_symbol"
