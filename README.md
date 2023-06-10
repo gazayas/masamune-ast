@@ -1,6 +1,6 @@
 # Masamune
 
-## A Ruby source code analyzer based on Ripper’s Abstract Syntax Tree generator (`Ripper#sexp`).
+## A Ruby source code analyzer based on Ripper’s Abstract Syntax Tree generator.
 
 ## Installation
 
