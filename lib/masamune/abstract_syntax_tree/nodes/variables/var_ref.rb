@@ -11,7 +11,7 @@ module Masamune
 
       def extract_data_nodes
         [
-          DataNode.new(@contents[1], @ast_id)
+          DataNode.new(@contents[1], @ast_id, self)
         ]
       end
     end

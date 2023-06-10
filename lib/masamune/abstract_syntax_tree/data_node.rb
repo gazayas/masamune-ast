@@ -11,8 +11,9 @@ module Masamune
     class DataNode < Node
       attr_reader :type, :token, :line_position
 
-      def initialize(contents, ast_id)
+      def initialize(contents, ast_id, parent)
         @type, @token, @line_position = contents
+        @parent = parent
         super(contents, ast_id)
       end
 
