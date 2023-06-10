@@ -14,7 +14,7 @@ module Masamune
       # we just use a method specifically for getting the symbol.
       # This should be the same as the :dyna_symbol type.
       def get_symbol_data
-        DataNode.new(@contents[1][1], @ast_id)
+        DataNode.new(@contents[1][1], @ast_id, self)
       end
     end
   end

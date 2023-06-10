@@ -14,7 +14,7 @@ module Masamune
       # nice to find out and document/implement it somewhere.
       def extract_data_nodes
         @contents[1][1].map do |content|
-          DataNode.new(content, @ast_id)
+          DataNode.new(content, @ast_id, self)
         end
       end
     end
