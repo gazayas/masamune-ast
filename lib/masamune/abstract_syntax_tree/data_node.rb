@@ -27,7 +27,7 @@ module Masamune
       def self.order_results_by_position(position_and_token_ary)
         # Extract the line numbers first, i.e - 4 from [4, 7]
         line_numbers = position_and_token_ary.map do |position_and_token|
-          line_number = position_and_token[:position].first
+          position_and_token[:position].first
         end.uniq.sort
 
         final_result = []
