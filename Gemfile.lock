@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    masamune-ast (1.1.4)
+    masamune-ast (1.1.5)
       activesupport
 
 GEM
