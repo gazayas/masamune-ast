@@ -90,6 +90,7 @@ msmn = Masamune::AbstractSyntaxTree.new(code)
 msmn.all_methods
 #=> [{:position=>[2, 4], :token=>"sum"},
 #=> {:position=>[2, 8], :token=>"times"},
+#=> {:position=>[3, 2], :token=>"puts"},
 #=> {:position=>[6, 4], :token=>"foo"},
 #=> {:position=>[8, 0], :token=>"foo"},
 #=> {:position=>[9, 0], :token=>"foo"}]
@@ -97,6 +98,7 @@ msmn.all_methods
 msmn.method_calls
 #=> [{:position=>[2, 4], :token=>"sum"},
 #=> {:position=>[2, 8], :token=>"times"},
+#=> {:position=>[3, 2], :token=>"puts"},
 #=> {:position=>[8, 0], :token=>"foo"},
 #=> {:position=>[9, 0], :token=>"foo"}]
 
