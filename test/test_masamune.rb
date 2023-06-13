@@ -41,8 +41,8 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(methods)
-    assert msmn.all_methods.size == 3
-    assert msmn.method_calls.size == 2
+    assert msmn.all_methods.size == 4
+    assert msmn.method_calls.size == 3
     assert msmn.method_definitions.size == 1
   end
 
@@ -63,7 +63,7 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(blocks)
     methods = msmn.all_methods
-    assert methods.size == 5
+    assert methods.size == 8
 
     method_names = methods.map {|m| m[:token]}
     assert method_names.include?("sum")
@@ -167,6 +167,7 @@ class TestMasamune < Minitest::Test
     expected_results = [
       {:position=>[2, 4], :token=>"sum"},
       {:position=>[2, 8], :token=>"times"},
+      {:position=>[3, 2], :token=>"puts"},
       {:position=>[6, 4], :token=>"foo"},
       {:position=>[8, 0], :token=>"foo"},
       {:position=>[9, 0], :token=>"foo"}

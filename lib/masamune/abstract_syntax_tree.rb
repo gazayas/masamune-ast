@@ -74,7 +74,8 @@ module Masamune
     def method_calls(name: nil, result_type: Hash)
       method_classes = [
         :vcall,
-        :call
+        :call,
+        :command
       ].map {|type| get_node_class(type)}
       results = find_nodes(method_classes, token: name, result_type: result_type)
       order_results(results)
