@@ -3,16 +3,17 @@
 # These values are the `type`, `token`, and `position`, respectively.
 # It is simliar to what you see in `Ripper.lex(code)` and `Masamune::AbstractSyntaxTree's @lex_nodes`.
 
-# We break this down into a simpler structure, `position_and_token`,
-# which looks like this: {position: [4, 7], token: "ruby"}
+# We break this down into a simpler structure, `line_data_and_token`,
+# which looks like this: {line_number: 4, index_on_line: 7, token: "ruby"}
 
 module Masamune
   class AbstractSyntaxTree
     class DataNode < Node
-      attr_reader :type, :token, :line_position
+      attr_reader :type, :token, :line_number, :index_on_line
 
       def initialize(contents, ast_id, parent)
-        @type, @token, @line_position = contents
+        @type, @token, line_position = contents
+        @line_number, @index_on_line = line_position
         @parent = parent
         super(contents, ast_id)
       end
@@ -20,33 +21,26 @@ module Masamune
       # Results here represent the position and token of the
       # data we're searching in the form of a Hash like the following:
       # [
-      #   {position: [4, 7], token: "ruby"},
-      #   {position: [7, 7], token: "rails"}
+      #   {line_number: 4, index_on_line: 7, token: "ruby"},
+      #   {line_number: 7, index_on_line: 7, token: "rails"}
       # ]
       # TODO: Worry about using a faster sorting algorithm later.
-      def self.order_results_by_position(position_and_token_ary)
-        # Extract the line numbers first, i.e - 4 from [4, 7]
-        line_numbers = position_and_token_ary.map do |position_and_token|
-          position_and_token[:position].first
-        end.uniq.sort
-
+      def self.order_results_by_position(results)
         final_result = []
+
+        line_numbers = results.map {|result| result[:line_number]}.uniq.sort
         line_numbers.each do |line_number|
           # Group data together in an array if they're on the same line.
-          shared_line_data = position_and_token_ary.select do |position_and_token|
-            position_and_token[:position].first == line_number
-          end
+          shared_line_data = results.select {|result| result[:line_number] == line_number}
 
           # Sort the positions on each line number respectively.
-          positions_on_line = shared_line_data.map do |position_and_token|
-            position_and_token[:position].last
-          end.sort
+          indexes_on_line = shared_line_data.map {|data| data[:index_on_line]}.sort
 
           # Apply to the final result.
-          positions_on_line.each do |position_on_line|
-            shared_line_data.each do |position_and_token|
-              if position_and_token[:position].last == position_on_line
-                final_result << position_and_token
+          indexes_on_line.each do |index_on_line|
+            shared_line_data.each do |data|
+              if data[:index_on_line] == index_on_line
+                final_result << data
               end
             end
           end
@@ -55,8 +49,16 @@ module Masamune
         final_result
       end
 
-      def position_and_token
-        {position: @line_position, token: @token}
+      def line_data_and_token
+        {
+          line_number: @line_number,
+          index_on_line: @index_on_line,
+          token: @token
+        }
+      end
+
+      def position
+        [@line_number, @index_on_line]
       end
     end
   end

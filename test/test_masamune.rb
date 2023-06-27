@@ -74,8 +74,8 @@ class TestMasamune < Minitest::Test
 
     # Check block params and their line positions.
     assert msmn.block_params.size == 4
-    assert msmn.block_params.first == {position: [4, 18], token: "n"}
-    assert msmn.block_params.last == {position: [11, 23], token: "v"}
+    assert msmn.block_params.first == {line_number: 4, index_on_line: 18, token: "n"}
+    assert msmn.block_params.last == {line_number: 11, index_on_line: 23, token: "v"}
   end
 
   def test_find_comments
@@ -101,8 +101,8 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(symbol_literals)
     assert msmn.symbols.size == 2
-    assert msmn.symbols.first == {position: [2, 1], token: "foo"}
-    assert msmn.symbols.last == {position: [3, 1], token: "bar"}
+    assert msmn.symbols.first == {line_number: 2, index_on_line: 1, token: "foo"}
+    assert msmn.symbols.last == {line_number: 3, index_on_line: 1, token: "bar"}
 
     x = "foo"
     y = "bar"
@@ -114,7 +114,8 @@ class TestMasamune < Minitest::Test
     msmn = Masamune::AbstractSyntaxTree.new(string_symbols)
     assert msmn.symbols.size == 2
     assert msmn.string_symbols.size == 1
-    assert msmn.string_symbols.first[:position] == [1, 2]
+    assert msmn.string_symbols.first[:line_number] == 1
+    assert msmn.string_symbols.first[:index_on_line] == 2
     assert msmn.string_symbols.first[:token] == "foo_bar"
   end
 
@@ -141,7 +142,8 @@ class TestMasamune < Minitest::Test
     msmn = Masamune::AbstractSyntaxTree.new(vars)
     nodes = msmn.strings(result_type: :nodes)
     assert nodes.size == 2
-    assert nodes.first.data_nodes.first.position_and_token[:position] == [1, 1]
+    assert nodes.first.data_nodes.first.line_data_and_token[:line_number] == 1
+    assert nodes.first.data_nodes.first.line_data_and_token[:index_on_line] == 1
   end
 
   def test_order_results
@@ -165,12 +167,12 @@ class TestMasamune < Minitest::Test
     # order_results(results).
     results = msmn.all_methods
     expected_results = [
-      {:position=>[2, 4], :token=>"sum"},
-      {:position=>[2, 8], :token=>"times"},
-      {:position=>[3, 2], :token=>"puts"},
-      {:position=>[6, 4], :token=>"foo"},
-      {:position=>[8, 0], :token=>"foo"},
-      {:position=>[9, 0], :token=>"foo"}
+      {:line_number=>2, :index_on_line=>4, :token=>"sum"},
+      {:line_number=>2, :index_on_line=>8, :token=>"times"},
+      {:line_number=>3, :index_on_line=>2, :token=>"puts"},
+      {:line_number=>6, :index_on_line=>4, :token=>"foo"},
+      {:line_number=>8, :index_on_line=>0, :token=>"foo"},
+      {:line_number=>9, :index_on_line=>0, :token=>"foo"}
     ]
 
     assert_equal expected_results, results
