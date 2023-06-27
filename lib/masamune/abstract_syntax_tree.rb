@@ -150,16 +150,17 @@ module Masamune
         # Data for symbols are housed within a nested node, so we handle those differently here.
         # Read the comments for `get_symbol_data` in the symbol node classes for details.
         if node.class == Masamune::AbstractSyntaxTree::SymbolLiteral || node.class == Masamune::AbstractSyntaxTree::DynaSymbol
-          final_result << node.get_symbol_data.position_and_token
+          final_result << node.get_symbol_data.line_data_and_token
         else
-          node.data_nodes.each {|dn| final_result << dn.position_and_token} if node.data_nodes
+          node.data_nodes.each {|dn| final_result << dn.line_data_and_token} if node.data_nodes
         end
       end
 
       # Only order the information if we're returning hashes.
       # TODO: We might want to change the placement of order_results_by_position
       # if the operation is being done against hashes and not data nodes.
-      nodes.first.class.is_a?(Hash) ? DataNode.order_results_by_position(final_result) : final_result
+      # nodes.first.class.is_a?(Hash) ? DataNode.order_results_by_position(final_result) : final_result
+      final_result
     end
 
     def replace(type:, old_token:, new_token:)
