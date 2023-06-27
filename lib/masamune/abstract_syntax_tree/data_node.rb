@@ -56,6 +56,10 @@ module Masamune
           token: @token
         }
       end
+
+      def position
+        [@line_number, @index_on_line]
+      end
     end
   end
 end
