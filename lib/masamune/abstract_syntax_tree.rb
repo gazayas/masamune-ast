@@ -111,8 +111,7 @@ module Masamune
     end
 
     def find_nodes(token_classes, token: nil, result_type: Hash)
-      # Ensure the classes are in an array
-      token_classes = [token_classes].flatten
+      token_classes = Array(token_classes)
 
       nodes = []
       token_classes.each do |klass|
