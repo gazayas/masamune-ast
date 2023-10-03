@@ -30,7 +30,6 @@ require "masamune/abstract_syntax_tree/nodes/symbol"
 require "masamune/abstract_syntax_tree/nodes/vcall"
 
 require "pp"
-require "pry"
 
 module Masamune
 end
