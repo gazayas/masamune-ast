@@ -165,13 +165,7 @@ module Masamune
     private
 
     def get_node_class(type)
-      begin
-        "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}".constantize
-      rescue NameError
-        # For all other nodes that we haven't covered yet, we just make a general class.
-        # We can worry about adding the classes for other nodes as we go.
-        Node
-      end
+      "#{self.class}::#{type.to_s.camelize}".safe_constantize || Node # Return base Node class for any not-yet-covered nodes.
     end
 
     # We only order results when they are a Hash.
