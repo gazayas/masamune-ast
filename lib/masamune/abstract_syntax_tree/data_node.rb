@@ -26,7 +26,11 @@ module Masamune
       # ]
       # TODO: Worry about using a faster sorting algorithm later.
       def self.order_results_by_position(results)
-        results.sort_by { [_1[:line_number], _1[:index_on_line]] }
+        results.sort do |a, b|
+          by_line = a[:line_number] <=> b[:line_number]
+          # If we're on the same line, refer to the inner index for order.
+          by_line.zero? ? a[:index_on_line] <=> b[:index_on_line] : by_line
+        end
       end
 
       def line_data_and_token
