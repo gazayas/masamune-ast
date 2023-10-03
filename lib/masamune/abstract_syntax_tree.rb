@@ -52,32 +52,22 @@ module Masamune
 
     # TODO: Add block_params: true to the arguments.
     def variables(name: nil, result_type: Hash)
-      var_classes = [
-        :var_field,
-        :var_ref,
-        :params
-      ].map {|type| get_node_class(type)}
-      results = find_nodes(var_classes, token: name, result_type: result_type)
+      results = find_nodes([VarField, VarRef, Params], token: name, result_type: result_type)
       order_results(results)
     end
 
     def strings(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:string_content), token: content, result_type: result_type)
+      results = find_nodes(StringContent, token: content, result_type: result_type)
       order_results(results)
     end
 
     def method_definitions(name: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:def), token: name, result_type: result_type)
+      results = find_nodes(Def, token: name, result_type: result_type)
       order_results(results)
     end
 
     def method_calls(name: nil, result_type: Hash)
-      method_classes = [
-        :vcall,
-        :call,
-        :command
-      ].map {|type| get_node_class(type)}
-      results = find_nodes(method_classes, token: name, result_type: result_type)
+      results = find_nodes([Vcall, Call, Command], token: name, result_type: result_type)
       order_results(results)
     end
 
@@ -95,17 +85,17 @@ module Masamune
     end
 
     def symbol_literals(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:symbol_literal), token: content, result_type: result_type)
+      results = find_nodes(SymbolLiteral, token: content, result_type: result_type)
       order_results(results)
     end
 
     def string_symbols(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:dyna_symbol), token: content, result_type: result_type)
+      results = find_nodes(DynaSymbol, token: content, result_type: result_type)
       order_results(results)
     end
 
     def comments(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:comment), token: content, result_type: result_type)
+      results = find_nodes(Comment, token: content, result_type: result_type)
       order_results(results)
     end
 
@@ -116,7 +106,7 @@ module Masamune
 
     def block_params(content: nil, result_type: Hash)
       # TODO: do_block_params + brace_block_params
-      results = find_nodes(get_node_class(:params), token: content, result_type: result_type)
+      results = find_nodes(Params, token: content, result_type: result_type)
       order_results(results)
     end
 
