@@ -26,27 +26,7 @@ module Masamune
       # ]
       # TODO: Worry about using a faster sorting algorithm later.
       def self.order_results_by_position(results)
-        final_result = []
-
-        line_numbers = results.map {|result| result[:line_number]}.uniq.sort
-        line_numbers.each do |line_number|
-          # Group data together in an array if they're on the same line.
-          shared_line_data = results.select {|result| result[:line_number] == line_number}
-
-          # Sort the positions on each line number respectively.
-          indexes_on_line = shared_line_data.map {|data| data[:index_on_line]}.sort
-
-          # Apply to the final result.
-          indexes_on_line.each do |index_on_line|
-            shared_line_data.each do |data|
-              if data[:index_on_line] == index_on_line
-                final_result << data
-              end
-            end
-          end
-        end
-
-        final_result
+        results.sort_by { [_1[:line_number], _1[:index_on_line]] }
       end
 
       def line_data_and_token
