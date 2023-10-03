@@ -126,7 +126,7 @@ module Masamune
 
       nodes = []
       token_classes.each do |klass|
-        if klass == Masamune::AbstractSyntaxTree::Comment
+        if klass == Comment
           nodes = @comment_list.dup
         else
           nodes << @node_list.select {|node| node.class == klass}
@@ -149,7 +149,7 @@ module Masamune
       nodes.each do |node|
         # Data for symbols are housed within a nested node, so we handle those differently here.
         # Read the comments for `get_symbol_data` in the symbol node classes for details.
-        if node.class == Masamune::AbstractSyntaxTree::SymbolLiteral || node.class == Masamune::AbstractSyntaxTree::DynaSymbol
+        if node.class == SymbolLiteral || node.class == DynaSymbol
           final_result << node.get_symbol_data.line_data_and_token
         else
           node.data_nodes.each {|dn| final_result << dn.line_data_and_token} if node.data_nodes
