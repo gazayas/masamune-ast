@@ -15,7 +15,7 @@ jobs:
         ruby-version:
           - "3.2"
 
-    name: ${{ format('Tests ruby@{1}', matrix.ruby-version) }}
+    name: ${{ format('Tests ruby@{0}', matrix.ruby-version) }}
     runs-on: "ubuntu-latest"
 
     steps:
