@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    masamune-ast (1.2.0)
+    masamune-ast (1.2.1)
       activesupport
 
 GEM
@@ -26,6 +26,7 @@ GEM
       concurrent-ruby (~> 1.0)
 
 PLATFORMS
+  x86_64-darwin-21
   x86_64-linux
 
 DEPENDENCIES
