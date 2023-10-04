@@ -3,6 +3,24 @@
 require "test_helper"
 
 class TestMasamune < Minitest::Test
+  def test_find_nodes
+    code = <<~CODE
+      "first string"
+      "second string"
+      # comment
+    CODE
+
+    msmn = Masamune::AbstractSyntaxTree.new(code)
+    strings = msmn.find_nodes(Masamune::AbstractSyntaxTree::StringContent)
+    comments = msmn.find_nodes(Masamune::AbstractSyntaxTree::Comment)
+
+    assert_equal strings.size, 2
+    assert_equal strings.first, {line_number: 1, index_on_line: 1, token: "first string"}
+    assert_equal strings.last, {line_number: 2, index_on_line: 1, token: "second string"}
+    assert_equal comments.size, 1
+    assert_equal comments.first, {:line_number=>3, :index_on_line=>0, :token=>"# comment\n"}
+  end
+
   def test_find_variable
     similar_tokens = <<~CODE
       java = "java"
