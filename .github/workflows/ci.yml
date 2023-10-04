@@ -1,0 +1,30 @@
+name: "Tests"
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version:
+          - "3.2"
+
+    name: ${{ format('Tests ruby@{1}', matrix.ruby-version) }}
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: "actions/checkout@v3"
+      - uses: "ruby/setup-ruby@v1"
+        with:
+          rubygems: latest
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+
+      - name: Run tests
+        run: rake test
