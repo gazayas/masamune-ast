@@ -52,32 +52,22 @@ module Masamune
 
     # TODO: Add block_params: true to the arguments.
     def variables(name: nil, result_type: Hash)
-      var_classes = [
-        :var_field,
-        :var_ref,
-        :params
-      ].map {|type| get_node_class(type)}
-      results = find_nodes(var_classes, token: name, result_type: result_type)
+      results = find_nodes([VarField, VarRef, Params], token: name, result_type: result_type)
       order_results(results)
     end
 
     def strings(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:string_content), token: content, result_type: result_type)
+      results = find_nodes(StringContent, token: content, result_type: result_type)
       order_results(results)
     end
 
     def method_definitions(name: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:def), token: name, result_type: result_type)
+      results = find_nodes(Def, token: name, result_type: result_type)
       order_results(results)
     end
 
     def method_calls(name: nil, result_type: Hash)
-      method_classes = [
-        :vcall,
-        :call,
-        :command
-      ].map {|type| get_node_class(type)}
-      results = find_nodes(method_classes, token: name, result_type: result_type)
+      results = find_nodes([Vcall, Call, Command], token: name, result_type: result_type)
       order_results(results)
     end
 
@@ -95,17 +85,17 @@ module Masamune
     end
 
     def symbol_literals(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:symbol_literal), token: content, result_type: result_type)
+      results = find_nodes(SymbolLiteral, token: content, result_type: result_type)
       order_results(results)
     end
 
     def string_symbols(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:dyna_symbol), token: content, result_type: result_type)
+      results = find_nodes(DynaSymbol, token: content, result_type: result_type)
       order_results(results)
     end
 
     def comments(content: nil, result_type: Hash)
-      results = find_nodes(get_node_class(:comment), token: content, result_type: result_type)
+      results = find_nodes(Comment, token: content, result_type: result_type)
       order_results(results)
     end
 
@@ -116,17 +106,16 @@ module Masamune
 
     def block_params(content: nil, result_type: Hash)
       # TODO: do_block_params + brace_block_params
-      results = find_nodes(get_node_class(:params), token: content, result_type: result_type)
+      results = find_nodes(Params, token: content, result_type: result_type)
       order_results(results)
     end
 
     def find_nodes(token_classes, token: nil, result_type: Hash)
-      # Ensure the classes are in an array
-      token_classes = [token_classes].flatten
+      token_classes = Array(token_classes)
 
       nodes = []
       token_classes.each do |klass|
-        if klass == Masamune::AbstractSyntaxTree::Comment
+        if klass == Comment
           nodes = @comment_list.dup
         else
           nodes << @node_list.select {|node| node.class == klass}
@@ -149,7 +138,7 @@ module Masamune
       nodes.each do |node|
         # Data for symbols are housed within a nested node, so we handle those differently here.
         # Read the comments for `get_symbol_data` in the symbol node classes for details.
-        if node.class == Masamune::AbstractSyntaxTree::SymbolLiteral || node.class == Masamune::AbstractSyntaxTree::DynaSymbol
+        if node.class == SymbolLiteral || node.class == DynaSymbol
           final_result << node.get_symbol_data.line_data_and_token
         else
           node.data_nodes.each {|dn| final_result << dn.line_data_and_token} if node.data_nodes
@@ -176,13 +165,7 @@ module Masamune
     private
 
     def get_node_class(type)
-      begin
-        "Masamune::AbstractSyntaxTree::#{type.to_s.camelize}".constantize
-      rescue NameError
-        # For all other nodes that we haven't covered yet, we just make a general class.
-        # We can worry about adding the classes for other nodes as we go.
-        Node
-      end
+      "#{self.class}::#{type.to_s.camelize}".safe_constantize || Node # Return base Node class for any not-yet-covered nodes.
     end
 
     # We only order results when they are a Hash.
