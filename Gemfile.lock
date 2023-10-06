@@ -24,7 +24,7 @@ GEM
     rake (13.0.6)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    yarp (0.11.0)
+    yarp (0.13.0)
 
 PLATFORMS
   x86_64-linux
@@ -34,7 +34,7 @@ DEPENDENCIES
   minitest (~> 5.0)
   pry
   rake (~> 13.0)
-  yarp (= 0.11.0)
+  yarp (= 0.13.0)
 
 BUNDLED WITH
    2.4.1
