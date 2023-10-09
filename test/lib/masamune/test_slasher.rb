@@ -28,7 +28,7 @@ class TestSlasher < Minitest::Test
     assert_equal new_code, expected_code
   end
 
-  def test_replace_by_masamune_node_type
+  def test_replace_by_prism_node_type
     code = <<~CODE
       10.times do |n|
         puts n
@@ -42,8 +42,8 @@ class TestSlasher < Minitest::Test
     msmn = Masamune::AbstractSyntaxTree.new(code)
 
     types_to_replace = [
-      Masamune::AbstractSyntaxTree::VarRef,
-      Masamune::AbstractSyntaxTree::Params
+      Prism::RequiredParameterNode,
+      Prism::LocalVariableReadNode,
     ]
     new_code = msmn.replace(type: types_to_replace, old_token: "n", new_token: "foo")
     expected_code = <<~CODE
