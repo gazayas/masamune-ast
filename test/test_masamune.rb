@@ -81,7 +81,7 @@ class TestMasamune < Minitest::Test
     methods = msmn.all_methods
     assert_equal methods.size, 8
 
-    method_names = methods.map {|m| m.token}
+    method_names = methods.map(&:token)
     assert method_names.include?("sum")
     assert method_names.include?("times")
 

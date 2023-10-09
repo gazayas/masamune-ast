@@ -22,10 +22,8 @@ module Masamune
       tree_node.class.include(NodeHelper) unless tree_node.class.include?(NodeHelper)
 
       @nodes << tree_node
-      if tree_node.compact_child_nodes.any?
-        tree_node.compact_child_nodes.each do |child_node|
-          register_nodes(child_node)
-        end
+      tree_node.compact_child_nodes.each do |child_node|
+        register_nodes(child_node)
       end
     end
 
