@@ -11,7 +11,7 @@ module Masamune
       end
 
       nodes_of_tokens_to_replace = nodes.select do |node|
-        node.token == old_token
+        node.token_value == old_token
       end
 
       # Build from lex nodes

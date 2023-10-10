@@ -5,8 +5,6 @@ module Masamune
     class Comment < Prism::Comment
       attr_reader :ast_id
 
-      include NodeHelper
-
       def initialize(comment_type, comment_location, ast_id)
         @ast_id = ast_id
         super(comment_type, comment_location)

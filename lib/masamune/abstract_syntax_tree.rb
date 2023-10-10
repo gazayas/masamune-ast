@@ -1,3 +1,5 @@
+require_relative "abstract_syntax_tree/prism/node_extensions"
+
 module Masamune
   class AbstractSyntaxTree
     attr_reader :code, :tree, :prism
@@ -18,9 +20,6 @@ module Masamune
     end
 
     def register_nodes(tree_node = @prism.value)
-      # Include our in-house Masamune node helper for all Prism nodes present.
-      tree_node.class.include(NodeHelper) unless tree_node.class.include?(NodeHelper)
-
       @nodes << tree_node
       tree_node.compact_child_nodes.each do |child_node|
         register_nodes(child_node)
@@ -30,7 +29,7 @@ module Masamune
     def find_nodes(node_classes, token: nil)
       node_classes = Array(node_classes)
       result = @nodes.select {|node| node_classes.include?(node.class)}
-      token.present? ? result.select {|node| node.token == token} : result
+      token.present? ? result.select {|node| node.token_value == token} : result
     end
 
     def variables(token: nil)
@@ -63,7 +62,7 @@ module Masamune
     def symbols(token: nil)
       find_nodes(Prism::SymbolNode, token: token)
     end
-    
+
     def symbol_literals(token: nil)
       result = find_nodes(Prism::SymbolNode, token: token)
 
