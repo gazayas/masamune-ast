@@ -12,11 +12,11 @@ class TestMasamune < Minitest::Test
     msmn = Masamune::AbstractSyntaxTree.new(code)
     strings = msmn.find_nodes(Prism::StringNode)
 
-    assert_equal strings.size, 2
-    assert_equal strings.first.token, "first string"
-    assert_equal strings.first.line_number, 1
-    assert_equal strings.last.token, "second string"
-    assert_equal strings.last.line_number, 2
+    assert_equal 2, strings.size
+    assert_equal "first string", strings.first.token
+    assert_equal 1, strings.first.line_number
+    assert_equal "second string", strings.last.token
+    assert_equal 2, strings.last.line_number
   end
 
   def test_find_variable
@@ -28,9 +28,9 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(similar_tokens)
-    assert_equal msmn.variables.size, 4
-    assert_equal msmn.variables(token: "java").size, 3
-    assert_equal msmn.variables(token: "javascript").size, 1
+    assert_equal 4, msmn.variables.size
+    assert_equal 3, msmn.variables(token: "java").size
+    assert_equal 1, msmn.variables(token: "javascript").size
   end
 
   def test_find_string
@@ -41,10 +41,10 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(strings)
-    assert_equal msmn.strings.size, 3
-    assert_equal msmn.strings(token: "foo").size, 1
-    assert_equal msmn.strings(token: "bar").size, 1
-    assert_equal msmn.strings(token: "foo bar").size, 1
+    assert_equal 3, msmn.strings.size
+    assert_equal 1, msmn.strings(token: "foo").size
+    assert_equal 1, msmn.strings(token: "bar").size
+    assert_equal 1, msmn.strings(token: "foo bar").size
   end
 
   def test_find_method_and_string
@@ -57,9 +57,9 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(methods)
-    assert_equal msmn.all_methods.size, 4
-    assert_equal msmn.method_calls.size, 3
-    assert_equal msmn.method_definitions.size, 1
+    assert_equal 4, msmn.all_methods.size
+    assert_equal 3, msmn.method_calls.size
+    assert_equal 1, msmn.method_definitions.size
   end
 
   def test_chained_method_calls
@@ -79,14 +79,14 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(blocks)
     methods = msmn.all_methods
-    assert_equal methods.size, 8
+    assert_equal 8, methods.size
 
     method_names = methods.map(&:token)
     assert method_names.include?("sum")
     assert method_names.include?("times")
 
     # Picks up ary, n, z, k, and v.
-    assert_equal msmn.variables.size, 9
+    assert_equal 9, msmn.variables.size
   end
 
   def test_find_comments
@@ -98,8 +98,8 @@ class TestMasamune < Minitest::Test
     msmn = Masamune::AbstractSyntaxTree.new(comments)
 
     # Comments don't have a data node in @tree.
-    assert_equal msmn.comments.size, 2
-    assert_equal msmn.comments.first.token, "# First comment\n"
+    assert_equal 2, msmn.comments.size, 2
+    assert_equal "# First comment\n", msmn.comments.first.token
   end
 
   def test_find_symbols
@@ -110,9 +110,9 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(symbol_literals)
-    assert_equal msmn.symbols.size, 2
-    assert_equal msmn.symbols.first.token, "foo"
-    assert_equal msmn.symbols.last.token, "bar"
+    assert_equal 2, msmn.symbols.size
+    assert_equal "foo", msmn.symbols.first.token
+    assert_equal "bar", msmn.symbols.last.token
 
     x = "foo"
     y = "bar"
@@ -122,11 +122,11 @@ class TestMasamune < Minitest::Test
     CODE
 
     msmn = Masamune::AbstractSyntaxTree.new(string_symbols)
-    assert_equal msmn.symbols.size, 2
-    assert_equal msmn.string_symbols.size, 1
-    assert_equal msmn.string_symbols.first.line_number, 1
-    assert_equal msmn.string_symbols.first.token_location.start_column, 2
-    assert_equal msmn.string_symbols.first.token, "foo_bar"
+    assert_equal 2, msmn.symbols.size
+    assert_equal 1, msmn.string_symbols.size
+    assert_equal 1, msmn.string_symbols.first.line_number
+    assert_equal 2, msmn.string_symbols.first.token_location.start_column
+    assert_equal "foo_bar", msmn.string_symbols.first.token
   end
 
   def test_lex_nodes_return_proper_type
