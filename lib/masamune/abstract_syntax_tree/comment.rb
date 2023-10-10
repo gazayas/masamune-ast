@@ -13,7 +13,7 @@ module Masamune
       end
 
       # We grab the comment from the original Prism object's source because
-      # Prism::Comment doesn't have a method that show's the string itself.
+      # Prism::Comment doesn't have a method that shows the string itself.
       def token
         ast = ObjectSpace._id2ref(@ast_id)
         ast.prism.source.source[self.location.start_offset..self.location.end_offset]
