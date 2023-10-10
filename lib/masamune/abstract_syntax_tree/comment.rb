@@ -12,12 +12,11 @@ module Masamune
         super(comment_type, comment_location)
       end
 
-      # TODO: Potentially just grab this from the proper Lex node.
-      # Prism.parse(code).value.slice does not contain any comments that are placed at the end.
-      # Also, there is no helper method to grab comment tokens in Prism.
+      # We grab the comment from the original Prism object's source because
+      # Prism::Comment doesn't have a method that show's the string itself.
       def token
         ast = ObjectSpace._id2ref(@ast_id)
-        ast.code[self.location.start_offset..self.location.end_offset]
+        ast.prism.source.source[self.location.start_offset..self.location.end_offset]
       end
     end
   end
