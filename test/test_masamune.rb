@@ -13,9 +13,9 @@ class TestMasamune < Minitest::Test
     strings = msmn.find_nodes(Prism::StringNode)
 
     assert_equal 2, strings.size
-    assert_equal "first string", strings.first.token
+    assert_equal "first string", strings.first.token_value
     assert_equal 1, strings.first.line_number
-    assert_equal "second string", strings.last.token
+    assert_equal "second string", strings.last.token_value
     assert_equal 2, strings.last.line_number
   end
 
@@ -81,9 +81,9 @@ class TestMasamune < Minitest::Test
     methods = msmn.all_methods
     assert_equal 8, methods.size
 
-    method_names = methods.map(&:token)
-    assert method_names.include?("sum")
-    assert method_names.include?("times")
+    method_names = methods.map(&:token_value)
+    assert_includes method_names, "sum"
+    assert_includes method_names, "times"
 
     # Picks up ary, n, z, k, and v.
     assert_equal 9, msmn.variables.size
@@ -111,8 +111,8 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(symbol_literals)
     assert_equal 2, msmn.symbols.size
-    assert_equal "foo", msmn.symbols.first.token
-    assert_equal "bar", msmn.symbols.last.token
+    assert_equal "foo", msmn.symbols.first.token_value
+    assert_equal "bar", msmn.symbols.last.token_value
 
     x = "foo"
     y = "bar"
@@ -126,7 +126,7 @@ class TestMasamune < Minitest::Test
     assert_equal 1, msmn.string_symbols.size
     assert_equal 1, msmn.string_symbols.first.line_number
     assert_equal 2, msmn.string_symbols.first.token_location.start_column
-    assert_equal "foo_bar", msmn.string_symbols.first.token
+    assert_equal "foo_bar", msmn.string_symbols.first.token_value
   end
 
   def test_lex_nodes_return_proper_type
