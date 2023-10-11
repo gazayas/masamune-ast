@@ -76,5 +76,7 @@ module Prism
 
   class Comment
     def comment? = true
+    def token_location = location
+    def token_value = location.slice
   end
 end

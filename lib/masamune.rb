@@ -8,7 +8,6 @@ require "active_support/core_ext/string/inflections"
 require "masamune/lex_node"
 require "masamune/slasher"
 require "masamune/abstract_syntax_tree"
-require "masamune/abstract_syntax_tree/comment"
 
 require "pp"
 

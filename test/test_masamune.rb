@@ -97,9 +97,8 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(comments)
 
-    # Comments don't have a data node in @tree.
     assert_equal 2, msmn.comments.size, 2
-    assert_equal "# First comment\n", msmn.comments.first.token
+    assert_equal "# First comment", msmn.comments.first.token_value
   end
 
   def test_find_symbols

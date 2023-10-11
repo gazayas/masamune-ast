@@ -87,9 +87,7 @@ module Masamune
     end
 
     def comments(token: nil)
-      @prism.comments.map do |comment|
-        Comment.new(comment.type, comment.location, self.__id__)
-      end
+      @prism.comments
     end
 
     def replace(type:, old_token:, new_token:)
