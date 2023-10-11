@@ -7,7 +7,9 @@ module Masamune
         type_to_method = type.to_s.pluralize.to_sym
         ast.send(type_to_method)
       elsif type.is_a?(Array)
-        type.map {|klass| ast.find_nodes(klass)}.flatten
+        symbolized_types = type.map{|t| t.name.split("::").pop.underscore.to_sym}
+        ast.visitor.search_types = symbolized_types
+        ast.perform_search
       end
 
       nodes_of_tokens_to_replace = nodes.select do |node|

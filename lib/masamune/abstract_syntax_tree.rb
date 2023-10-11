@@ -1,9 +1,10 @@
 require_relative "abstract_syntax_tree/prism/node_extensions"
+require_relative "abstract_syntax_tree/visitors/search_visitor"
 
 module Masamune
   class AbstractSyntaxTree
     attr_reader :code, :tree, :prism
-    attr_accessor :nodes, :lex_nodes
+    attr_accessor :lex_nodes, :visitor
 
     def initialize(code)
       @code = code
@@ -14,64 +15,51 @@ module Masamune
       end
 
       @prism = Prism.parse(code)
-      @nodes = []
-      register_nodes
-      @nodes = order_nodes(@nodes)
+      @visitor = SearchVisitor.new
     end
 
-    def register_nodes(tree_node = @prism.value)
-      @nodes << tree_node
-      tree_node.compact_child_nodes.each do |child_node|
-        register_nodes(child_node)
-      end
+    def variables(token_value: nil)
+      @visitor.search_types = [
+        :local_variable_write_node,
+        :local_variable_read_node,
+        :required_parameter_node
+      ]
+      perform_search(token_value: token_value)
     end
 
-    def find_nodes(node_classes, token: nil)
-      node_classes = Array(node_classes)
-      result = @nodes.select {|node| node_classes.include?(node.class)}
-      token.present? ? result.select {|node| node.token_value == token} : result
+    def strings(token_value: nil)
+      @visitor.search_types = :string_node
+      perform_search(token_value: token_value)
     end
 
-    def variables(token: nil)
-      find_nodes(
-        [
-          Prism::LocalVariableWriteNode,
-          Prism::LocalVariableReadNode,
-          Prism::RequiredParameterNode
-        ],
-        token: token
-      )
+    def all_methods(token_value: nil)
+      order_nodes(method_definitions(token_value: token_value) + method_calls(token_value: token_value))
     end
 
-    def strings(token: nil)
-      find_nodes(Prism::StringNode, token: token)
+    def method_definitions(token_value: nil)
+      @visitor.search_types = :def_node
+      perform_search(token_value: token_value)
     end
 
-    def all_methods(token: nil)
-      order_nodes(method_definitions(token: token) + method_calls(token: token))
+    def method_calls(token_value: nil)
+      @visitor.search_types = :call_node
+      perform_search(token_value: token_value)
     end
 
-    def method_definitions(token: nil)
-      find_nodes(Prism::DefNode, token: token)
+    def symbols(token_value: nil)
+      @visitor.search_types = :symbol_node
+      perform_search(token_value: token_value)
     end
 
-    def method_calls(token: nil)
-      find_nodes(Prism::CallNode, token: token)
-    end
-
-    def symbols(token: nil)
-      find_nodes(Prism::SymbolNode, token: token)
-    end
-
-    def symbol_literals(token: nil)
-      result = find_nodes(Prism::SymbolNode, token: token)
+    def symbol_literals(token_value: nil)
+      result = symbols(token_value: token_value)
 
       # TODO: Describe why closing_loc has to happen.
       result.select{|node| node.closing_loc.nil?}
     end
 
-    def string_symbols(token: nil)
-      result = find_nodes(Prism::SymbolNode, token: token)
+    def string_symbols(token_value: nil)
+      result = symbols(token_value: token_value)
 
       # TODO: Describe why closing_loc has to happen.
       result.reject{|node| node.closing_loc.nil?}
@@ -79,15 +67,23 @@ module Masamune
 
     # Retrieves all parameters within pipes (i.e. - |x, y, z|).
     def block_parameters
-      find_nodes(Prism::BlockParametersNode)
+      @visitor.search_types = :block_parameters_node
+      perform_search
     end
 
-    def parameters(token: nil)
-      find_nodes(Prism::ParametersNode, token: token)
+    def parameters(token_value: nil)
+      @visitor.search_types = :parameters_node
+      perform_search(token_value: token_value)
     end
 
     def comments(token: nil)
       @prism.comments
+    end
+
+    def perform_search(token_value: nil)
+      @visitor.visit(@prism.value)
+      @visitor_results = order_nodes(@visitor.results)
+      token_value.present? ? @visitor.results.select{|res| res.token_value == token_value} : @visitor.results
     end
 
     def replace(type:, old_token:, new_token:)

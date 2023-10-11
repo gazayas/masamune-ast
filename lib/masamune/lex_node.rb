@@ -25,15 +25,15 @@ module Masamune
 
     def variable?
       return false unless identifier?
-      ast.variables(token: @token).any?
+      ast.variables(token_value: @token).any?
     end
 
     def method_definition?
-      ast.method_definitions(token: @token).any?
+      ast.method_definitions(token_value: @token).any?
     end
 
     def method_call?
-      ast.method_calls(token: @token).any?
+      ast.method_calls(token_value: @token).any?
     end
 
     def method?

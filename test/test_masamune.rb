@@ -3,22 +3,6 @@
 require "test_helper"
 
 class TestMasamune < Minitest::Test
-  def test_find_nodes
-    code = <<~CODE
-      "first string"
-      "second string"
-    CODE
-
-    msmn = Masamune::AbstractSyntaxTree.new(code)
-    strings = msmn.find_nodes(Prism::StringNode)
-
-    assert_equal 2, strings.size
-    assert_equal "first string", strings.first.token_value
-    assert_equal 1, strings.first.line_number
-    assert_equal "second string", strings.last.token_value
-    assert_equal 2, strings.last.line_number
-  end
-
   def test_find_variable
     similar_tokens = <<~CODE
       java = "java"
@@ -29,8 +13,8 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(similar_tokens)
     assert_equal 4, msmn.variables.size
-    assert_equal 3, msmn.variables(token: "java").size
-    assert_equal 1, msmn.variables(token: "javascript").size
+    assert_equal 3, msmn.variables(token_value: "java").size
+    assert_equal 1, msmn.variables(token_value: "javascript").size
   end
 
   def test_find_string
@@ -42,9 +26,9 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(strings)
     assert_equal 3, msmn.strings.size
-    assert_equal 1, msmn.strings(token: "foo").size
-    assert_equal 1, msmn.strings(token: "bar").size
-    assert_equal 1, msmn.strings(token: "foo bar").size
+    assert_equal 1, msmn.strings(token_value: "foo").size
+    assert_equal 1, msmn.strings(token_value: "bar").size
+    assert_equal 1, msmn.strings(token_value: "foo bar").size
   end
 
   def test_find_method_and_string
