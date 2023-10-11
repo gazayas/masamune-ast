@@ -59,6 +59,12 @@ module Prism
     def token_value = slice
   end
 
+  class StringNode
+    node_predicate :string?
+    def token_location = content_loc
+    def token_value = content
+  end
+
   class SymbolNode
     node_predicate :symbol?
     node_predicate :symbol_literal?, -> { closing_loc.nil? }
