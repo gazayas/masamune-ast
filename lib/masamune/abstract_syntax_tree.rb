@@ -82,7 +82,7 @@ module Masamune
 
     def perform_search(token_value: nil)
       @visitor.visit(@prism.value)
-      @visitor_results = order_nodes(@visitor.results)
+      @visitor.results = order_nodes(@visitor.results)
       token_value.present? ? @visitor.results.select{|res| res.token_value == token_value} : @visitor.results
     end
 
