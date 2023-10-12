@@ -2,13 +2,13 @@ require_relative "abstract_syntax_tree/prism/node_extensions"
 
 module Masamune
   class AbstractSyntaxTree
-    attr_reader :code, :tree, :prism
-    attr_accessor :lex_nodes, :visitor
+    attr_reader :code, :prism, :ripper
+    attr_accessor :lex_nodes
 
     def initialize(code)
       @code = code
       @prism = Prism.parse(code)
-      @tree = Ripper.sexp(code)
+      @ripper = Ripper.sexp(code)
       raw_lex_nodes = Ripper.lex(code)
       @lex_nodes = raw_lex_nodes.map do |lex_node|
         LexNode.new(raw_lex_nodes.index(lex_node), lex_node, self.__id__)
@@ -76,7 +76,8 @@ module Masamune
       visitor.results
     end
 
-    def comments(token: nil)
+    # TODO: Search by token_value if necessary.
+    def comments
       @prism.comments
     end
 
