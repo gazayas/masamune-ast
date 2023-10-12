@@ -1,6 +1,6 @@
 module Masamune
   module Slasher
-    def self.replace(type:, old_token:, new_token:, code:, ast:)
+    def self.replace(type:, old_token_value:, new_token_value:, code:, ast:)
       # `type` refers to the singluar form of a method name from the ast like `method_definitions`.
       nodes = if type.is_a?(Symbol)
         type_to_method = type.to_s.pluralize.to_sym
@@ -8,7 +8,7 @@ module Masamune
       end
 
       nodes_of_tokens_to_replace = nodes.select do |node|
-        node.token_value == old_token
+        node.token_value == old_token_value
       end
 
       # Build from lex nodes
@@ -22,7 +22,7 @@ module Masamune
           end
         end
 
-        match_found ? new_token : lex_node.token
+        match_found ? new_token_value : lex_node.token
       end
 
       result.join
