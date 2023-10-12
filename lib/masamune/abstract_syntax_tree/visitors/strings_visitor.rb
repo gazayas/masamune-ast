@@ -9,7 +9,7 @@ module Masamune
       end
 
       def visit_string_node(node)
-        results << node unless token_value.present? && token_value != node.content
+        results << node if token_value.nil? || token_value == node.content
         super
       end
     end
