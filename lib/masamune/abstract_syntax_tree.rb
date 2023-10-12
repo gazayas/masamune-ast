@@ -81,11 +81,11 @@ module Masamune
       @prism.comments
     end
 
-    def replace(type:, old_token:, new_token:)
+    def replace(type:, old_token_value:, new_token_value:)
       Slasher.replace(
         type: type,
-        old_token: old_token,
-        new_token: new_token,
+        old_token_value: old_token_value,
+        new_token_value: new_token_value,
         code: @code,
         ast: self
       )
