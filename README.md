@@ -23,16 +23,22 @@ require "masamune"
 Isolate and replace variables, methods, or strings in your Ruby source code according to the specific tokens allotted when the code is intially parsed:
 ```ruby
 code = <<~CODE
-  hello = "Hello"
-  puts hello
+  :hello
+  hello = "hello"
+  def hello
+    puts hello
+  end
 CODE
 
 msmn = Masamune::AbstractSyntaxTree.new(code)
-msmn.replace(type: :variable, old_token: "hello", new_token: "greeting")
+msmn.replace(type: :variable, old_token_value: "hello", new_token_value: "greeting")
 
 # This will produce the following code in string form.
-greeting = "Hello"
-puts greeting
+:hello
+greeting = "hello"
+def hello
+  puts greeting
+end
 ```
 
 Pinpoint variables and methods in your source code even when other tokens have the same or similar spelling:
@@ -49,7 +55,7 @@ msmn = Masamune::AbstractSyntaxTree.new(code)
 # Returns an array of Prism nodes
 msmn.variables
 
-msmn.variables.first.token
+msmn.variables.first.token_value
 #=> "java"
 msmn.variables.first.token_location
 #=> (1,0)-(1,4)
@@ -57,7 +63,7 @@ msmn.variables.first.token_location
 # Returns an array of Prism nodes
 msmn.strings
 
-last_java_node = msmn.variables(name: "java").last
+last_java_node = msmn.variables(token_value: "java").last
 last_java_node.token_location
 #=> (3,5)-(3,9)
 
