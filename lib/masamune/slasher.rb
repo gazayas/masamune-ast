@@ -1,15 +1,10 @@
 module Masamune
   module Slasher
     def self.replace(type:, old_token:, new_token:, code:, ast:)
-      # `type` can either be a method from the ast like `method_definitions`,
-      # or it can be a list of Prism node classes.
+      # `type` refers to the singluar form of a method name from the ast like `method_definitions`.
       nodes = if type.is_a?(Symbol)
         type_to_method = type.to_s.pluralize.to_sym
         ast.send(type_to_method)
-      elsif type.is_a?(Array)
-        symbolized_types = type.map{|t| t.name.split("::").pop.underscore.to_sym}
-        ast.visitor.search_types = symbolized_types
-        ast.perform_search
       end
 
       nodes_of_tokens_to_replace = nodes.select do |node|
