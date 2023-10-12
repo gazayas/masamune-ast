@@ -9,7 +9,9 @@ module Masamune
       end
 
       def visit_call_node(node)
-        results << node unless token_value.present? && token_value != node.name
+        if node.method_call?
+          results << node unless token_value.present? && token_value != node.name
+        end
         super
       end
     end

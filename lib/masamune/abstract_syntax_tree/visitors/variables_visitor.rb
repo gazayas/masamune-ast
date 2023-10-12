@@ -22,6 +22,13 @@ module Masamune
         results << node unless token_value.present? && token_value != node.name.to_s
         super
       end
+
+      def visit_call_node(node)
+        if node.variable_call?
+          results << node unless token_value.present? && token_value != node.name
+        end
+        super
+      end
     end
   end
 end
