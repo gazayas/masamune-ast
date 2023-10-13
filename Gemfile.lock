@@ -3,6 +3,7 @@ PATH
   specs:
     masamune-ast (1.2.1)
       activesupport
+      prism (>= 0.13.0)
 
 GEM
   remote: https://rubygems.org/
@@ -18,6 +19,7 @@ GEM
       concurrent-ruby (~> 1.0)
     method_source (1.0.0)
     minitest (5.18.0)
+    prism (0.13.0)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -26,6 +28,7 @@ GEM
       concurrent-ruby (~> 1.0)
 
 PLATFORMS
+  arm64-darwin-22
   x86_64-darwin-21
   x86_64-linux
 
