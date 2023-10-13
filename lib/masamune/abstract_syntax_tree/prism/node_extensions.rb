@@ -11,8 +11,8 @@ module Prism
       token_location.start_line
     end
 
-    # #location provides helpful information for the source code of a node as a whole,
-    # but in Masamune we generally want the token itself, so we primarily get the token's location.
+    # #location provides helpful information for the source code of a node as a whole, but in
+    # Masamune we generally want the token value itself, so we primarily get the token value's location.
     def token_location
       location
     end
@@ -23,7 +23,7 @@ module Prism
     # have to know exactly which method to call the get the results you want.
     #
     # The `token` method simplifies all of this, and just gives you the
-    # variable, method name, etc. in String form by just calling `token`.
+    # variable, method name, etc. in String form by just calling `token_value`.
     def token_value
       content
     end
