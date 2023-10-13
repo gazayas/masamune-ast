@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "A layer of abstraction on top of Ripper for handling Abstract Syntax Trees in Ruby."
   spec.homepage = "https://www.github.com/gazayas/masamune-ast"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 2.7.0"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
