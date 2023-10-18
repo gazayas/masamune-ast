@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    masamune-ast (2.0.0)
+    masamune-ast (2.0.1)
       activesupport
       prism (>= 0.14.0)
 
