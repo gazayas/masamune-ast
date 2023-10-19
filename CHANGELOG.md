@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [2.0.2] - 2023-10-19
+
+- Get location information directly from comment object in #68
+
+## [2.0.1] - 2023-10-18
+
+- Fix results for the call node visitor #64.
+
 ## [2.0.0] - 2023-10-13
 
 - Migrate to Prism by @gazayas in #60
