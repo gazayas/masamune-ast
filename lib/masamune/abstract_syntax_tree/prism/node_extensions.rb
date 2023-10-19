@@ -78,5 +78,10 @@ module Prism
     def comment? = true
     def token_location = location
     def token_value = location.slice
+    def start_line = location.start_line
+    def start_column = location.start_column
+    def end_line = location.end_line
+    def end_column = location.end_column
+    def line_number = start_line
   end
 end
