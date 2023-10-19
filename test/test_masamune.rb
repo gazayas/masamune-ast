@@ -81,7 +81,7 @@ class TestMasamune < Minitest::Test
 
     msmn = Masamune::AbstractSyntaxTree.new(comments)
 
-    assert_equal 2, msmn.comments.size, 2
+    assert_equal 2, msmn.comments.size
     assert_equal "# First comment", msmn.comments.first.token_value
 
     # Test location
